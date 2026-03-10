@@ -1,0 +1,10 @@
+# Notebook dependencies
+pandas==2.2.2
+scikit-learn==1.5.2
+matplotlib==3.9.2
+numpy==1.26.4
+scipy==1.13.1
+joblib==1.4.2
+
+# Development dependencies
+ipykernel==7.1.0

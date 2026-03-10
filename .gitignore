@@ -1,0 +1,7 @@
+.venv/
+notebooks/__pycache__/
+notebooks/.ipynb_checkpoints/
+__pycache__/
+
+
+notebooks/TODELETE.ipynb
