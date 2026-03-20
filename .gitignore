@@ -2,9 +2,5 @@
 notebooks/__pycache__/
 notebooks/.ipynb_checkpoints/
 __pycache__/
-<<<<<<< HEAD
-=======
-
-
+.DS_Store
 notebooks/TODELETE.ipynb
->>>>>>> f5abf5f2450a4caef6a0a80eb075574453748c4a
