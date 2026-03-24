@@ -1,5 +1,14 @@
+<<<<<<< HEAD
 .DS_Store
+=======
+>>>>>>> EDA_Enrico
 .venv/
 notebooks/__pycache__/
 notebooks/.ipynb_checkpoints/
 __pycache__/
+<<<<<<< HEAD
+=======
+
+
+notebooks/TODELETE.ipynb
+>>>>>>> EDA_Enrico
