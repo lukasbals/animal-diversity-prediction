@@ -1,0 +1,270 @@
+{
+  "population_id": "111105",
+  "species_binomial": "Petrogale_xanthopus",
+  "common_name": "Yellow-footed Rock-wallaby",
+  "country": "australia",
+  "location": "Mootwingee Downs",
+  "last_observed_year": 2020,
+  "prediction_horizon_years": 10,
+  "future_environment_strategy": "last_value",
+  "forecast_model": {
+    "feature_set": "forecast_plus_env_transformed",
+    "model_name": "RandomForest",
+    "ci_level": 0.9,
+    "residual_std_log": 0.46352835629302813
+  },
+  "historical_records": [
+    {
+      "year": 1980,
+      "population": 36.0
+    },
+    {
+      "year": 1981,
+      "population": 21.0
+    },
+    {
+      "year": 1982,
+      "population": 26.0
+    },
+    {
+      "year": 1983,
+      "population": 11.0
+    },
+    {
+      "year": 1984,
+      "population": 20.0
+    },
+    {
+      "year": 1985,
+      "population": 24.0
+    },
+    {
+      "year": 1987,
+      "population": 18.0
+    },
+    {
+      "year": 1988,
+      "population": 17.0
+    },
+    {
+      "year": 1989,
+      "population": 18.0
+    },
+    {
+      "year": 1990,
+      "population": 19.0
+    },
+    {
+      "year": 1991,
+      "population": 18.0
+    },
+    {
+      "year": 1992,
+      "population": 10.0
+    },
+    {
+      "year": 1993,
+      "population": 7.0
+    },
+    {
+      "year": 1994,
+      "population": 15.0
+    },
+    {
+      "year": 1995,
+      "population": 12.0
+    },
+    {
+      "year": 1996,
+      "population": 17.0
+    },
+    {
+      "year": 1997,
+      "population": 17.0
+    },
+    {
+      "year": 1998,
+      "population": 9.0
+    },
+    {
+      "year": 1999,
+      "population": 10.0
+    },
+    {
+      "year": 2000,
+      "population": 15.0
+    },
+    {
+      "year": 2001,
+      "population": 15.0
+    },
+    {
+      "year": 2002,
+      "population": 15.0
+    },
+    {
+      "year": 2003,
+      "population": 7.0
+    },
+    {
+      "year": 2004,
+      "population": 19.0
+    },
+    {
+      "year": 2005,
+      "population": 16.0
+    },
+    {
+      "year": 2006,
+      "population": 15.0
+    },
+    {
+      "year": 2007,
+      "population": 12.5
+    },
+    {
+      "year": 2008,
+      "population": 24.5
+    },
+    {
+      "year": 2009,
+      "population": 25.0
+    },
+    {
+      "year": 2010,
+      "population": 26.5
+    },
+    {
+      "year": 2011,
+      "population": 45.0
+    },
+    {
+      "year": 2012,
+      "population": 58.5
+    },
+    {
+      "year": 2013,
+      "population": 54.0
+    },
+    {
+      "year": 2014,
+      "population": 57.5
+    },
+    {
+      "year": 2015,
+      "population": 57.5
+    },
+    {
+      "year": 2016,
+      "population": 59.5
+    },
+    {
+      "year": 2017,
+      "population": 62.0
+    },
+    {
+      "year": 2018,
+      "population": 36.0
+    },
+    {
+      "year": 2019,
+      "population": 24.5
+    },
+    {
+      "year": 2020,
+      "population": 20.0
+    }
+  ],
+  "forecast_records": [
+    {
+      "year": 2021,
+      "forecast_population": 22.674359668060834,
+      "lower_ci": 10.044012720274685,
+      "upper_ci": 49.749244852261036
+    },
+    {
+      "year": 2022,
+      "forecast_population": 28.621989973815587,
+      "lower_ci": 9.07617055547996,
+      "upper_ci": 86.08291361062963
+    },
+    {
+      "year": 2023,
+      "forecast_population": 27.285319826265855,
+      "lower_ci": 6.550750890231029,
+      "upper_ci": 104.95758346487693
+    },
+    {
+      "year": 2024,
+      "forecast_population": 29.676948249237952,
+      "lower_ci": 5.675894541289861,
+      "upper_ci": 139.96615038867833
+    },
+    {
+      "year": 2025,
+      "forecast_population": 30.18573741583781,
+      "lower_ci": 4.668642960833844,
+      "upper_ci": 170.56667387401072
+    },
+    {
+      "year": 2026,
+      "forecast_population": 35.78476461743678,
+      "lower_ci": 4.682195386609348,
+      "upper_ci": 237.13311860922389
+    },
+    {
+      "year": 2027,
+      "forecast_population": 38.20069726706855,
+      "lower_ci": 4.2137438649463785,
+      "upper_ci": 293.7391943351939
+    },
+    {
+      "year": 2028,
+      "forecast_population": 38.00986652526446,
+      "lower_ci": 3.5137450293933874,
+      "upper_ci": 336.1412599535916
+    },
+    {
+      "year": 2029,
+      "forecast_population": 40.813350749496365,
+      "lower_ci": 3.2448362581677204,
+      "upper_ci": 410.87838459876986
+    },
+    {
+      "year": 2030,
+      "forecast_population": 41.143932058511254,
+      "lower_ci": 2.780441820110109,
+      "upper_ci": 468.81572362901267
+    }
+  ],
+  "top_environmental_drivers": [
+    {
+      "feature": "precip_change_1y",
+      "contribution_pct": 91.20125117642749,
+      "importance_mean": 0.026702284964716723
+    },
+    {
+      "feature": "agricultural_land_change_1y",
+      "contribution_pct": 8.073564416251333,
+      "importance_mean": 0.002363812063353149
+    },
+    {
+      "feature": "temp_avg_c",
+      "contribution_pct": 0.7251844073211584,
+      "importance_mean": 0.00021232253336962714
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "iucn": {
+    "binomial": "Petrogale_xanthopus",
+    "current_iucn": null,
+    "future_iucn": null,
+    "target_year": 2030,
+    "note": "IUCN lookup not available"
+  },
+  "plot_config": {
+    "record_color": "#1f77b4",
+    "forecast_color": "#ff7f0e",
+    "ci_alpha": 0.2
+  }
+}

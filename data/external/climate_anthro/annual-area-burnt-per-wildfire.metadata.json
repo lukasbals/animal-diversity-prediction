@@ -1,0 +1,40 @@
+{
+  "chart": {
+    "title": "Average area burnt per wildfire",
+    "citation": "Global Wildfire Information System (2025)",
+    "originalChartUrl": "https://ourworldindata.org/grapher/annual-area-burnt-per-wildfire?v=1&csvType=full&useColumnShortNames=false",
+    "selection": [
+      "Africa",
+      "North America",
+      "South America",
+      "Europe",
+      "Oceania",
+      "Asia"
+    ]
+  },
+  "columns": {
+    "Annual area burnt per wildfire": {
+      "titleShort": "Annual area burnt per wildfire",
+      "titleLong": "Annual area burnt per wildfire",
+      "descriptionShort": "The average area burnt per [wildfire](#dod:wildfires), in hectares. The 2026 data is incomplete and was last updated 26 March 2026.",
+      "descriptionKey": [
+        "Wildfires are detected through the use of satellite imagery obtained from MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite). These satellite systems are capable of identifying thermal anomalies and alterations in landscape patterns, which are indicative of burning.",
+        "The data provider is presently engaged in a global accuracy assessment and acknowledged that they might be underestimating the genuine impact of wildfires, primarily due to constraints imposed by the spatial resolution of the sensors they employ."
+      ],
+      "descriptionProcessing": "The area burnt per wildfire is calculated by dividing the area burnt by wildfires by the number of fires.",
+      "shortUnit": "ha",
+      "unit": "hectares",
+      "timespan": "2012-2026",
+      "type": "Numeric",
+      "owidVariableId": 830945,
+      "shortName": "area_ha_per_wildfire",
+      "lastUpdated": "2026-03-26",
+      "nextUpdate": "2026-04-02",
+      "citationShort": "Global Wildfire Information System (2026); Global Wildfire Information System (2024) – with minor processing by Our World in Data",
+      "citationLong": "Global Wildfire Information System (2026); Global Wildfire Information System (2024) – with minor processing by Our World in Data. “Annual area burnt per wildfire” [dataset]. Global Wildfire Information System, “Seasonal wildfire trends” [original data].",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/830945.metadata.json"
+    }
+  },
+  "dateDownloaded": "2026-03-27",
+  "activeFilters": {}
+}

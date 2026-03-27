@@ -1,0 +1,37 @@
+{
+  "chart": {
+    "title": "Share of the population living in urban areas",
+    "subtitle": "Share of the total population living in urban areas, given as estimates by HYDE until 2023 and UN projections through 2050, using the median fertility scenario for future urbanization trends.",
+    "note": "Because the estimates of city and metropolitan areas are based on national definitions of what constitutes a city or metropolitan area, cross-country comparisons should be made with caution.",
+    "citation": "United Nations, Department of Economic and Social Affairs, Population Division (2018); HYDE (2023)",
+    "originalChartUrl": "https://ourworldindata.org/grapher/urban-population-share-2050?v=1&csvType=full&useColumnShortNames=false",
+    "selection": [
+      "Sao Tome and Principe",
+      "North Macedonia",
+      "Papua New Guinea",
+      "Georgia"
+    ]
+  },
+  "columns": {
+    "Share of population residing in urban areas (HYDE estimates and UN projections)": {
+      "titleShort": "Share of population residing in urban areas",
+      "titleLong": "Share of population residing in urban areas",
+      "descriptionShort": "Share of population living in urban areas in a country over time.",
+      "descriptionKey": [
+        "The projection method for urban population in the World Urbanization Prospects involves a two-step process using an established extrapolation method based on urban-rural ratios. Initially, the average annual rate of change in the urban-rural ratio is calculated using data from the last two censuses, which informs the rate of change in urban and rural populations. This rate is then extrapolated, assuming a logistic path of urban proportion growth. Subsequently, a \"world norm\" is applied, estimated from empirical urban-rural growth differences in two groups of countries categorized by population size. This norm uses a regression equation to establish a hypothetical urban-rural growth difference for different levels of initial urban percentage.\n\nThe country-specific urban-rural growth difference is then converged with this hypothetical difference over 25 years, allowing the urbanization process of a country to align with a global urbanization pattern. This method ensures that urban-rural growth differences evolve towards a worldwide trend rather than remaining constant."
+      ],
+      "shortUnit": "%",
+      "unit": "%",
+      "timespan": "-10000-2050",
+      "type": "Numeric",
+      "owidVariableId": 819998,
+      "shortName": "urbc_c_share",
+      "lastUpdated": "2024-01-17",
+      "citationShort": "United Nations, Department of Economic and Social Affairs, Population Division (2018); HYDE (2023) – with minor processing by Our World in Data",
+      "citationLong": "United Nations, Department of Economic and Social Affairs, Population Division (2018); HYDE (2023) – with minor processing by Our World in Data. “Share of population residing in urban areas” [dataset]. United Nations, Department of Economic and Social Affairs, Population Division, “World Urbanization Prospects Dataset”; PBL Netherlands Environmental Assessment Agency, “History Database of the Global Environment 3.3” [original data].",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/819998.metadata.json"
+    }
+  },
+  "dateDownloaded": "2026-03-27",
+  "activeFilters": {}
+}
