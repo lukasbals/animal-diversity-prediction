@@ -295,7 +295,15 @@ export function DashboardShell() {
       });
     }
 
-    const merged = [...baseForecast, ...bridgedPoints].sort((a, b) => a.year - b.year);
+    const projectedOriginPoint: ForecastPoint = {
+      year: species.forecast_origin_year,
+      historical: originPoint.historical,
+      projected: originPoint.historical,
+      lower: originPoint.historical ?? null,
+      upper: originPoint.historical ?? null,
+    };
+
+    const merged = [...baseForecast, projectedOriginPoint, ...bridgedPoints].sort((a, b) => a.year - b.year);
     const deduped = merged.filter(
       (point, index, array) => index === array.findIndex((candidate) => candidate.year === point.year),
     );
