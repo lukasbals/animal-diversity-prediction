@@ -303,12 +303,9 @@ export function DashboardShell() {
       upper: originPoint.historical ?? null,
     };
 
-    const merged = [...baseForecast, projectedOriginPoint, ...bridgedPoints].sort((a, b) => a.year - b.year);
-    const deduped = merged.filter(
-      (point, index, array) => index === array.findIndex((candidate) => candidate.year === point.year),
-    );
+    const merged = [...baseForecast.filter((point) => point.year !== species.forecast_origin_year), projectedOriginPoint, ...bridgedPoints].sort((a, b) => a.year - b.year);
 
-    return deduped;
+    return merged;
   }, [species, forecastHorizon]);
 
   const displaySpecies = species ?? {
