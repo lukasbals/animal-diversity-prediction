@@ -1,11 +1,9 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import * as Popover from "@radix-ui/react-popover";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import * as Select from "@radix-ui/react-select";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { geoCentroid } from "d3-geo";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -28,7 +26,6 @@ import {
   CircleAlert,
   ExternalLink,
   Info,
-  MapPin,
 } from "lucide-react";
 import { references } from "@/components/dashboard/data";
 import { DashboardCard } from "@/components/dashboard/card";
@@ -55,6 +52,7 @@ type SpeciesForecastResponse = {
   risk_score: number;
   latitude?: number | null;
   longitude?: number | null;
+  image: string;
   forecast_origin_year: number;
   forecast_horizon_years: number[];
   forecast: ForecastPoint[];
@@ -69,6 +67,7 @@ type PopulationMapPoint = {
   decline_risk: number;
   latitude: number;
   longitude: number;
+  image: string;
 };
 
 type SpeciesListItem = {
@@ -93,8 +92,8 @@ function RiskGauge({ value }: { value: number }) {
   const offset = circumference - (value / 100) * circumference;
 
   return (
-    <div className="flex min-w-[170px] flex-col items-center justify-center gap-3 rounded-3xl border border-white/10 bg-white/5 p-4">
-      <div className="relative h-32 w-32">
+    <div className="flex w-full min-w-0 max-w-[220px] flex-col items-center justify-center gap-3 rounded-3xl border border-white/10 bg-white/5 p-4">
+      <div className="relative h-28 w-28 sm:h-32 sm:w-32">
         <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
           <circle cx="70" cy="70" r="52" stroke="rgba(148,163,184,0.18)" strokeWidth="14" fill="none" />
           <circle
@@ -110,8 +109,8 @@ function RiskGauge({ value }: { value: number }) {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-4xl font-semibold text-white">{value}</span>
-          <span className="text-xs uppercase tracking-[0.28em] text-mutedText">risk</span>
+          <span className="text-3xl font-semibold text-white sm:text-4xl">{value}</span>
+          <span className="text-[10px] uppercase tracking-[0.28em] text-mutedText sm:text-xs">risk</span>
         </div>
       </div>
       <p className="max-w-[13rem] text-center text-sm text-slate-300">
@@ -123,7 +122,7 @@ function RiskGauge({ value }: { value: number }) {
 
 function ForecastChart({ data }: { data: ForecastPoint[] }) {
   return (
-    <ResponsiveContainer width="100%" height={300} minWidth={200}>
+    <ResponsiveContainer width="100%" height={280} minWidth={200}>
       <AreaChart data={data} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
         <defs>
           <linearGradient id="forecastBand" x1="0" y1="0" x2="0" y2="1">
@@ -175,7 +174,7 @@ function ForecastMix({ data }: { data: ForecastPoint[] }) {
   const colors = ["#22c55e", "#f97316"];
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+    <div className="w-full rounded-3xl border border-white/10 bg-white/5 p-4">
       <p className="text-xs uppercase tracking-[0.24em] text-mutedText">Current vs forecast</p>
       <div className="mt-4 h-40 min-w-0">
         <ResponsiveContainer width="100%" height="100%" minWidth={120}>
@@ -208,9 +207,11 @@ function EndangeredSpeciesMap({
   selectedPopulationId: number | null;
   onSelectPopulation: (populationId: number) => void;
 }) {
+  const selected = populations.find((population) => population.population_id === selectedPopulationId) ?? null;
+
   return (
     <DashboardCard className="overflow-hidden p-0">
-      <div className="flex flex-col gap-4 border-b border-white/10 px-6 py-5 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 border-b border-white/10 px-4 py-5 sm:px-6 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-xl font-semibold text-white">Endangered Species Map</h2>
           <p className="mt-1 text-sm text-mutedText">
@@ -221,7 +222,7 @@ function EndangeredSpeciesMap({
           {populations.length} mapped populations
         </div>
       </div>
-      <div className="world-glow relative h-[480px] overflow-hidden bg-slate-950/70 px-3 py-4">
+      <div className="world-glow relative h-[360px] overflow-hidden bg-slate-950/70 px-2 py-3 sm:h-[420px] sm:px-3 sm:py-4 lg:h-[480px]">
         <ComposableMap
           projection="geoMercator"
           projectionConfig={{ scale: 120 }}
@@ -249,16 +250,10 @@ function EndangeredSpeciesMap({
           {populations.map((population) => {
             const isSelected = population.population_id === selectedPopulationId;
             return (
-              <Marker
-                key={population.population_id}
-                coordinates={[population.longitude, population.latitude]}
-              >
+              <Marker key={population.population_id} coordinates={[population.longitude, population.latitude]}>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
-                    <g
-                      onClick={() => onSelectPopulation(population.population_id)}
-                      className="cursor-pointer"
-                    >
+                    <g onClick={() => onSelectPopulation(population.population_id)} className="cursor-pointer">
                       <circle
                         r={isSelected ? 7 : 5}
                         fill={isSelected ? "#ef4444" : "#f97316"}
@@ -278,27 +273,24 @@ function EndangeredSpeciesMap({
           })}
         </ComposableMap>
 
-        {selectedPopulationId ? (
-          <div className="absolute bottom-5 left-5 w-72 rounded-3xl border border-white/10 bg-slate-950/90 p-4 shadow-glow">
-            {(() => {
-              const selected = populations.find((population) => population.population_id === selectedPopulationId);
-              if (!selected) {
-                return null;
-              }
-              return (
-                <>
-                  <p className="text-lg font-semibold text-white">{selected.common_name}</p>
-                  <p className="mt-1 text-sm text-slate-300">Status: {selected.status}</p>
-                  <p className="mt-2 text-sm text-mutedText">Decline Risk: {selected.decline_risk}%</p>
-                  <button
-                    onClick={() => onSelectPopulation(selected.population_id)}
-                    className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-slate-200"
-                  >
-                    VIEW DETAILS <ChevronRight className="h-4 w-4" />
-                  </button>
-                </>
-              );
-            })()}
+        {selected ? (
+          <div className="absolute inset-x-3 bottom-3 rounded-3xl border border-white/10 bg-slate-950/90 p-4 shadow-glow sm:inset-x-auto sm:bottom-5 sm:left-5 sm:w-72">
+            <div className="flex items-center gap-3">
+              <div className="relative h-14 w-14 overflow-hidden rounded-2xl">
+                <Image src={selected.image} alt={selected.common_name} fill className="object-cover" />
+              </div>
+              <div>
+                <p className="text-base font-semibold text-white sm:text-lg">{selected.common_name}</p>
+                <p className="mt-1 text-sm text-slate-300">Status: {selected.status}</p>
+              </div>
+            </div>
+            <p className="mt-3 text-sm text-mutedText">Decline Risk: {selected.decline_risk}%</p>
+            <button
+              onClick={() => onSelectPopulation(selected.population_id)}
+              className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-slate-200"
+            >
+              VIEW DETAILS <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
         ) : null}
       </div>
@@ -396,13 +388,11 @@ export function DashboardShell() {
       upper: originPoint.historical ?? null,
     };
 
-    const merged = [
+    return [
       ...baseForecast.filter((point) => point.year !== species.forecast_origin_year),
       projectedOriginPoint,
       ...bridgedPoints,
     ].sort((a, b) => a.year - b.year);
-
-    return merged;
   }, [species, forecastHorizon]);
 
   const similarSpecies = useMemo(() => {
@@ -410,12 +400,13 @@ export function DashboardShell() {
       return speciesList.slice(0, 4);
     }
 
+    const selectedCard = speciesList.find((item) => item.species_id === species.species_id);
     return speciesList
       .filter((item) => item.species_id !== species.species_id)
       .filter(
         (item) =>
-          item.family === species.scientific_name.split(" ")[0] ||
-          item.class_name === "Mammalia" ||
+          item.family === selectedCard?.family ||
+          item.class_name === selectedCard?.class_name ||
           item.habitat === species.habitat,
       )
       .slice(0, 6);
@@ -435,22 +426,22 @@ export function DashboardShell() {
     risk_score: 71,
     latitude: 64.444593,
     longitude: 15.165737,
+    image: FALLBACK_SPECIES_IMAGE,
     forecast_origin_year: 2020,
     forecast_horizon_years: [3, 5, 10, 15, 20],
     forecast: [],
   } satisfies SpeciesForecastResponse;
 
-  const currentSpeciesCard = speciesList.find((item) => item.species_id === displaySpecies.species_id);
-  const currentSpeciesImage = currentSpeciesCard?.image ?? FALLBACK_SPECIES_IMAGE;
+  const currentSpeciesImage = displaySpecies.image ?? FALLBACK_SPECIES_IMAGE;
 
   return (
     <Tooltip.Provider>
-      <div className="min-h-screen bg-grid px-6 py-8 text-white md:px-10 xl:px-14">
-        <div className="mx-auto flex max-w-[1500px] flex-col gap-8">
-          <header className="flex items-start justify-between gap-6">
+      <div className="min-h-screen bg-grid px-4 py-6 text-white sm:px-6 md:px-10 xl:px-14">
+        <div className="mx-auto flex max-w-[1500px] flex-col gap-6 sm:gap-8">
+          <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
             <div>
               <p className="text-sm uppercase tracking-[0.28em] text-accent">Biodiversity intelligence</p>
-              <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white md:text-5xl">
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl md:text-5xl">
                 Species Extinction Risk Dashboard
               </h1>
             </div>
@@ -459,7 +450,7 @@ export function DashboardShell() {
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
                   <Dialog.Trigger asChild>
-                    <button className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-100 transition hover:bg-white/10">
+                    <button className="inline-flex h-12 w-12 items-center justify-center self-start rounded-full border border-white/10 bg-white/5 text-slate-100 transition hover:bg-white/10">
                       <Info className="h-5 w-5" />
                     </button>
                   </Dialog.Trigger>
@@ -503,28 +494,18 @@ export function DashboardShell() {
 
           <div className="grid gap-6 xl:grid-cols-[1.05fr_1.95fr]">
             <DashboardCard className="space-y-5">
-              <div className="relative h-64 overflow-hidden rounded-[24px]">
-                <Image
-                  src={currentSpeciesImage}
-                  alt={displaySpecies.common_name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
+              <div className="relative h-56 overflow-hidden rounded-[24px] sm:h-64">
+                <Image src={currentSpeciesImage} alt={displaySpecies.common_name} fill className="object-cover" priority />
               </div>
               <div>
-                <h2 className="text-3xl font-semibold text-white">{displaySpecies.common_name}</h2>
-                <p className="mt-1 text-base italic text-slate-300">
-                  {displaySpecies.scientific_name}
-                </p>
+                <h2 className="text-2xl font-semibold text-white sm:text-3xl">{displaySpecies.common_name}</h2>
+                <p className="mt-1 text-sm italic text-slate-300 sm:text-base">{displaySpecies.scientific_name}</p>
               </div>
               <div className="inline-flex w-fit rounded-full border border-orange-400/30 bg-orange-500/15 px-4 py-2 text-sm font-medium text-orange-200">
                 Status: {displaySpecies.status}
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                <p className="text-sm font-medium uppercase tracking-[0.24em] text-mutedText">
-                  Quick facts
-                </p>
+                <p className="text-sm font-medium uppercase tracking-[0.24em] text-mutedText">Quick facts</p>
                 <ul className="mt-4 space-y-3 text-sm text-slate-200">
                   <li>• Habitat: {displaySpecies.habitat ?? "Unknown"}</li>
                   <li>• Diet: {displaySpecies.diet ?? "Unknown"}</li>
@@ -537,15 +518,15 @@ export function DashboardShell() {
 
             <DashboardCard>
               <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-                <div className="flex-1">
-                  <div className="mb-4 flex items-start justify-between gap-4">
-                    <div>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
                       <h2 className="text-2xl font-semibold text-white">Extinction Risk Forecast</h2>
                       <p className="mt-1 text-sm text-mutedText">
                         Population trend loaded from the backend API for the selected population.
                       </p>
                     </div>
-                    <div className="min-w-[180px]">
+                    <div className="w-full sm:min-w-[180px] sm:max-w-[220px]">
                       <p className="mb-2 text-xs uppercase tracking-[0.24em] text-mutedText">
                         Forecast Horizon (max 20 years)
                       </p>
@@ -576,7 +557,7 @@ export function DashboardShell() {
                   </div>
                   <ForecastChart data={filteredForecast} />
                 </div>
-                <div className="flex flex-col gap-4">
+                <div className="flex w-full flex-col gap-4 sm:flex-row xl:w-auto xl:flex-col">
                   <RiskGauge value={displaySpecies.risk_score} />
                   <ForecastMix data={filteredForecast} />
                 </div>
@@ -584,20 +565,14 @@ export function DashboardShell() {
             </DashboardCard>
           </div>
 
-          <EndangeredSpeciesMap
-            populations={populations}
-            selectedPopulationId={selectedPopulationId}
-            onSelectPopulation={setSelectedPopulationId}
-          />
+          <EndangeredSpeciesMap populations={populations} selectedPopulationId={selectedPopulationId} onSelectPopulation={setSelectedPopulationId} />
 
           <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
             <DashboardCard>
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-2xl font-semibold text-white">Similar Species</h2>
-                  <p className="mt-1 text-sm text-mutedText">
-                    Species list loaded live from the backend dataset endpoint.
-                  </p>
+                  <p className="mt-1 text-sm text-mutedText">Species list loaded live from the backend dataset endpoint.</p>
                 </div>
                 <CircleAlert className="h-5 w-5 text-mutedText" />
               </div>
@@ -608,15 +583,15 @@ export function DashboardShell() {
                       <button
                         key={item.species_id}
                         onClick={() => setSelectedPopulationId(item.species_id)}
-                        className="flex min-w-[300px] items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10"
+                        className="flex min-w-[260px] max-w-[320px] items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10 sm:min-w-[300px]"
                       >
-                        <div className="relative h-20 w-20 overflow-hidden rounded-2xl">
+                        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl">
                           <Image src={item.image} alt={item.common_name} fill className="object-cover" />
                         </div>
-                        <div className="space-y-1">
-                          <p className="text-lg font-semibold text-white">{item.common_name}</p>
+                        <div className="min-w-0 space-y-1">
+                          <p className="truncate text-base font-semibold text-white sm:text-lg">{item.common_name}</p>
                           <p className="text-sm text-orange-200">{item.status}</p>
-                          <p className="text-sm text-slate-300">{item.decline}</p>
+                          <p className="line-clamp-2 text-sm text-slate-300">{item.decline}</p>
                         </div>
                       </button>
                     ))}
@@ -669,12 +644,7 @@ export function DashboardShell() {
           </div>
 
           <footer className="flex flex-col gap-3 border-t border-white/10 px-1 pt-2 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
-            <a
-              href="https://livingplanet.panda.org/"
-              target="_blank"
-              rel="noreferrer"
-              className="transition hover:text-white"
-            >
+            <a href="https://livingplanet.panda.org/" target="_blank" rel="noreferrer" className="transition hover:text-white">
               Main Reference: Living Planet Report
             </a>
             <a href="#references" className="transition hover:text-white">

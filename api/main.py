@@ -92,6 +92,7 @@ class SpeciesForecastResponse(BaseModel):
     risk_score: int
     latitude: float | None = None
     longitude: float | None = None
+    image: str
     forecast_origin_year: int
     forecast_horizon_years: list[int]
     forecast: list[ForecastPoint]
@@ -106,6 +107,7 @@ class PopulationMapPoint(BaseModel):
     decline_risk: int
     latitude: float
     longitude: float
+    image: str
 
 
 class SpeciesListItem(BaseModel):
@@ -180,11 +182,11 @@ def _species_image(common_name: str) -> str:
         "Wolverine": "https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=1200&q=80",
         "Moose": "https://images.unsplash.com/photo-1501706362039-c6e80948e4ca?auto=format&fit=crop&w=1200&q=80",
         "Mountain Pygmy-possum": "https://images.unsplash.com/photo-1500479694472-551d1fb6258d?auto=format&fit=crop&w=1200&q=80",
-        "Leadbeater's Possum": "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=1200&q=80",
+        "Leadbeater's Possum": "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?auto=format&fit=crop&w=1200&q=80",
         "Yellow-footed Rock-wallaby": "https://images.unsplash.com/photo-1466721591366-2d5fba72006d?auto=format&fit=crop&w=1200&q=80",
-        "Malleefowl": "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=1200&q=80",
+        "Malleefowl": "https://images.unsplash.com/photo-1549608276-5786777e6587?auto=format&fit=crop&w=1200&q=80",
         "Helmeted Honeyeater": "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=1200&q=80",
-        "Plains-wanderer": "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=1200&q=80",
+        "Plains-wanderer": "https://images.unsplash.com/photo-1501706362039-c6e80948e4ca?auto=format&fit=crop&w=1200&q=80",
     }
     return image_map.get(
         common_name,
@@ -293,10 +295,11 @@ def _build_species_forecast(row: pd.Series) -> SpeciesForecastResponse:
         None if pd.isna(latest_population) else f"~{int(round(float(latest_population)))}"
     )
     risk_score = _risk_score_from_row(row)
+    common_name = str(row["common_name"])
 
     return SpeciesForecastResponse(
         species_id=int(row["id"]),
-        common_name=str(row["common_name"]),
+        common_name=common_name,
         scientific_name=str(row["binomial"]).replace("_", " "),
         country=None if pd.isna(row["country"]) else str(row["country"]).title(),
         status=_status_from_risk(risk_score),
@@ -308,6 +311,7 @@ def _build_species_forecast(row: pd.Series) -> SpeciesForecastResponse:
         risk_score=risk_score,
         latitude=None if pd.isna(row["latitude"]) else float(row["latitude"]),
         longitude=None if pd.isna(row["longitude"]) else float(row["longitude"]),
+        image=_species_image(common_name),
         forecast_origin_year=origin_year,
         forecast_horizon_years=HORIZONS,
         forecast=[combined[year] for year in sorted(combined)],
@@ -330,10 +334,11 @@ def _build_species_list() -> list[SpeciesListItem]:
             decline = f"Population Change: {change:+.0f}%"
 
         risk_score = _risk_score_from_row(row)
+        common_name = str(row["common_name"])
         items.append(
             SpeciesListItem(
                 species_id=int(row["id"]),
-                common_name=str(row["common_name"]),
+                common_name=common_name,
                 scientific_name=str(row["binomial"]).replace("_", " "),
                 family=None if pd.isna(row["family"]) else str(row["family"]),
                 class_name=None if pd.isna(row["class"]) else str(row["class"]),
@@ -341,7 +346,7 @@ def _build_species_list() -> list[SpeciesListItem]:
                 habitat=None if pd.isna(row["t_biome"]) else str(row["t_biome"]),
                 decline=decline,
                 status=_status_from_risk(risk_score),
-                image=_species_image(str(row["common_name"])),
+                image=_species_image(common_name),
             )
         )
 
@@ -355,16 +360,18 @@ def _build_population_map() -> list[PopulationMapPoint]:
         if pd.isna(row["latitude"]) or pd.isna(row["longitude"]):
             continue
         risk_score = _risk_score_from_row(row)
+        common_name = str(row["common_name"])
         points.append(
             PopulationMapPoint(
                 population_id=int(row["id"]),
-                common_name=str(row["common_name"]),
+                common_name=common_name,
                 scientific_name=str(row["binomial"]).replace("_", " "),
                 country=None if pd.isna(row["country"]) else str(row["country"]).title(),
                 status=_status_from_risk(risk_score),
                 decline_risk=risk_score,
                 latitude=float(row["latitude"]),
                 longitude=float(row["longitude"]),
+                image=_species_image(common_name),
             )
         )
     return points
