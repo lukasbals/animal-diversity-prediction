@@ -639,12 +639,12 @@ export function DashboardShell() {
               <div className="space-y-3 text-sm">
                 <a
                   id="ethical-framework"
-                  href="https://www.iucnredlist.org/resources/categories-and-criteria"
+                  href="https://livingplanet.panda.org/"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 text-accent transition hover:text-green-300"
                 >
-                  Ethical Framework <ChevronRight className="h-4 w-4" />
+                  Main Reference: Living Planet Report <ChevronRight className="h-4 w-4" />
                 </a>
                 <div id="references" className="rounded-3xl border border-white/10 bg-white/5 p-4">
                   <p className="text-xs uppercase tracking-[0.24em] text-mutedText">References / Data Sources</p>
@@ -670,12 +670,12 @@ export function DashboardShell() {
 
           <footer className="flex flex-col gap-3 border-t border-white/10 px-1 pt-2 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
             <a
-              href="https://www.iucnredlist.org/resources/categories-and-criteria"
+              href="https://livingplanet.panda.org/"
               target="_blank"
               rel="noreferrer"
               className="transition hover:text-white"
             >
-              Ethical Framework
+              Main Reference: Living Planet Report
             </a>
             <a href="#references" className="transition hover:text-white">
               References / Data Sources
