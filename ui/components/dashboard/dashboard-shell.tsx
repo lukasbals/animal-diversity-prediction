@@ -539,12 +539,18 @@ export function DashboardShell() {
                 <ScrollArea.Viewport>
                   <div className="flex gap-4 pb-4">
                     {similarSpecies.map((item) => (
-                      <button key={item.species_id} onClick={() => setSelectedPopulationId(item.species_id)} className="flex min-w-[260px] max-w-[320px] items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10 sm:min-w-[300px]">
+                      <button
+                        key={item.species_id}
+                        onClick={() => setSelectedPopulationId(item.species_id)}
+                        title={`${item.common_name} — ${item.status}`}
+                        aria-label={`View ${item.common_name} details`}
+                        className="flex min-w-[260px] max-w-[320px] items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10 sm:min-w-[300px]"
+                      >
                         <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl">
                           <SpeciesImage src={item.image} alt={item.common_name} className="object-cover" />
                         </div>
                         <div className="min-w-0 space-y-1">
-                          <p className="truncate text-base font-semibold text-white sm:text-lg">{item.common_name}</p>
+                          <p className="line-clamp-2 whitespace-normal text-base font-semibold leading-snug text-white sm:text-lg">{item.common_name}</p>
                           <p className="text-sm text-orange-200">{item.status}</p>
                           <p className="line-clamp-2 text-sm text-slate-300">{item.decline}</p>
                         </div>
