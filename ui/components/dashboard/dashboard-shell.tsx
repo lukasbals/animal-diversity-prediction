@@ -376,14 +376,28 @@ export function DashboardShell() {
     return [...baseForecast.filter((point) => point.year !== species.forecast_origin_year), projectedOriginPoint, ...bridgedPoints].sort((a, b) => a.year - b.year);
   }, [species, forecastHorizon]);
 
-  const selectedCard = useMemo(() => speciesList.find((item) => item.species_id === species?.species_id), [species, speciesList]);
+  const selectedCard = useMemo(() => {
+    if (!species) return null;
+
+    return (
+      speciesList.find((item) => item.species_id === species.species_id) ??
+      speciesList.find((item) => item.common_name === species.common_name) ??
+      speciesList.find((item) => item.scientific_name === species.scientific_name) ??
+      null
+    );
+  }, [species, speciesList]);
 
   const similarSpecies = useMemo(() => {
     if (!species) return speciesList.slice(0, 4);
 
     return speciesList
-      .filter((item) => item.species_id !== species.species_id)
-      .filter((item) => item.family === selectedCard?.family || item.class_name === selectedCard?.class_name || item.habitat === selectedCard?.habitat)
+      .filter((item) => item.species_id !== selectedCard?.species_id)
+      .filter(
+        (item) =>
+          item.family === selectedCard?.family ||
+          item.class_name === selectedCard?.class_name ||
+          item.habitat === selectedCard?.habitat
+      )
       .slice(0, 6);
   }, [species, speciesList, selectedCard]);
 
