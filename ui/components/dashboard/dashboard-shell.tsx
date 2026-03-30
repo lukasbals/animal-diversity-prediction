@@ -264,8 +264,43 @@ export function DashboardShell() {
     if (!species) {
       return [];
     }
+
     const maxYear = species.forecast_origin_year + Number(forecastHorizon);
-    return species.forecast.filter((point) => point.year <= maxYear);
+    const baseForecast = species.forecast.filter((point) => point.year <= maxYear);
+
+    const originPoint = baseForecast.find((point) => point.year === species.forecast_origin_year);
+    const firstProjectedPoint = baseForecast.find(
+      (point) => point.year > species.forecast_origin_year && point.projected != null,
+    );
+
+    if (!originPoint || !firstProjectedPoint || firstProjectedPoint.year <= species.forecast_origin_year + 1) {
+      return baseForecast;
+    }
+
+    const bridgedPoints: ForecastPoint[] = [];
+    const gapYears = firstProjectedPoint.year - species.forecast_origin_year;
+    const startValue = originPoint.historical ?? 0;
+    const endValue = firstProjectedPoint.projected ?? 0;
+
+    for (let step = 1; step < gapYears; step += 1) {
+      const year = species.forecast_origin_year + step;
+      const ratio = step / gapYears;
+      const projected = Number((startValue + (endValue - startValue) * ratio).toFixed(4));
+      bridgedPoints.push({
+        year,
+        historical: null,
+        projected,
+        lower: Number((projected * 0.88).toFixed(4)),
+        upper: Number((projected * 1.12).toFixed(4)),
+      });
+    }
+
+    const merged = [...baseForecast, ...bridgedPoints].sort((a, b) => a.year - b.year);
+    const deduped = merged.filter(
+      (point, index, array) => index === array.findIndex((candidate) => candidate.year === point.year),
+    );
+
+    return deduped;
   }, [species, forecastHorizon]);
 
   const displaySpecies = species ?? {
