@@ -5,11 +5,20 @@ import joblib
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel, Field
 
 # ── Model loading ──────────────────────────────────────────────────────────────
 
 MODELS_DIR = Path(__file__).parent.parent / "data" / "models"
+DATASET_PATH = (
+    Path(__file__).parent.parent
+    / "data"
+    / "interim"
+    / "strict_forecasting"
+    / "lpd_terrestrial_strict_last2020_unitsusable_global_zeroskeep.csv"
+)
 HORIZONS = [3, 5, 10, 15, 20]
+SUPPORTED_SPECIES_ROW_ID = 27565
 
 
 def _load_models(prefix: str) -> dict[int, object]:
@@ -35,8 +44,6 @@ app = FastAPI(
 
 # ── Shared response schema ─────────────────────────────────────────────────────
 
-from pydantic import BaseModel, Field
-
 
 class HorizonPrediction(BaseModel):
     horizon: int = Field(..., description="Forecast horizon in years")
@@ -48,6 +55,33 @@ class HorizonPrediction(BaseModel):
 
 class PredictionResponse(BaseModel):
     predictions: list[HorizonPrediction]
+
+
+class ForecastPoint(BaseModel):
+    year: int
+    historical: float | None = None
+    projected: float | None = None
+    lower: float | None = None
+    upper: float | None = None
+
+
+class SpeciesForecastResponse(BaseModel):
+    species_id: int
+    common_name: str
+    scientific_name: str
+    country: str | None = None
+    status: str
+    habitat: str | None = None
+    diet: str | None = None
+    weight: str | None = None
+    population: str | None = None
+    units: str | None = None
+    risk_score: int
+    latitude: float | None = None
+    longitude: float | None = None
+    forecast_origin_year: int
+    forecast_horizon_years: list[int]
+    forecast: list[ForecastPoint]
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -70,6 +104,120 @@ def _predict_all_horizons(
     return results
 
 
+def _load_supported_species_row() -> pd.Series:
+    if not DATASET_PATH.exists():
+        raise RuntimeError(f"Dataset file not found: {DATASET_PATH}")
+
+    df = pd.read_csv(DATASET_PATH)
+    matches = df.loc[df["id"] == SUPPORTED_SPECIES_ROW_ID]
+    if matches.empty:
+        raise RuntimeError(
+            f"Supported species row not found in dataset: {SUPPORTED_SPECIES_ROW_ID}"
+        )
+    return matches.iloc[0]
+
+
+def _build_country_feature_row(row: pd.Series) -> tuple[pd.DataFrame, int]:
+    origin_year = int(row["last_obs_year"])
+    recent_years = [origin_year - 3, origin_year - 2, origin_year - 1, origin_year]
+    recent_values = [float(row[str(year)]) for year in recent_years]
+    log_values = np.log1p(recent_values)
+
+    feature_row = pd.DataFrame(
+        [
+            {
+                "Year": origin_year,
+                "lag_1": float(log_values[-1]),
+                "lag_2": float(log_values[-2]),
+                "lag_3": float(log_values[-3]),
+                "lag_4": float(log_values[-4]),
+                "year_gap_from_prev": 1.0,
+                "rolling_mean_3": float(log_values[-3:].mean()),
+                "latitude": None if pd.isna(row["latitude"]) else float(row["latitude"]),
+                "longitude": None if pd.isna(row["longitude"]) else float(row["longitude"]),
+                "rolling_std_3": float(log_values[-3:].std(ddof=0)),
+                "population_difference": float(log_values[-1] - log_values[-2]),
+                "population_growth_rate": float(
+                    0.0 if log_values[-2] == 0 else (log_values[-1] - log_values[-2]) / log_values[-2]
+                ),
+                "class": None if pd.isna(row["class"]) else row["class"],
+                "family": None if pd.isna(row["family"]) else row["family"],
+                "ipbes_subregion": None
+                if pd.isna(row["ipbes_subregion"])
+                else row["ipbes_subregion"],
+                "system_group": None if pd.isna(row["system_group"]) else row["system_group"],
+                "t_realm": None if pd.isna(row["t_realm"]) else row["t_realm"],
+                "t_biome": None if pd.isna(row["t_biome"]) else row["t_biome"],
+                "units": None if pd.isna(row["units"]) else row["units"],
+                "country": None if pd.isna(row["country"]) else row["country"],
+            }
+        ]
+    )
+    return feature_row, origin_year
+
+
+def _build_supported_species_forecast() -> SpeciesForecastResponse:
+    row = _load_supported_species_row()
+    feature_row, origin_year = _build_country_feature_row(row)
+    predictions = _predict_all_horizons(country_models, feature_row, origin_year)
+
+    historical_points = []
+    for year in range(origin_year - 8, origin_year + 1):
+        value = row.get(str(year))
+        if pd.notna(value):
+            historical_points.append(
+                ForecastPoint(year=year, historical=round(float(value), 4))
+            )
+
+    forecast_points = [
+        ForecastPoint(
+            year=prediction.target_year,
+            projected=prediction.predicted_population,
+            lower=round(prediction.predicted_population * 0.88, 4),
+            upper=round(prediction.predicted_population * 1.12, 4),
+        )
+        for prediction in predictions
+    ]
+
+    combined: dict[int, ForecastPoint] = {point.year: point for point in historical_points}
+    for point in forecast_points:
+        if point.year in combined:
+            existing = combined[point.year]
+            combined[point.year] = ForecastPoint(
+                year=point.year,
+                historical=existing.historical,
+                projected=point.projected,
+                lower=point.lower,
+                upper=point.upper,
+            )
+        else:
+            combined[point.year] = point
+
+    latest_population = row.get(str(origin_year))
+    latest_population_text = (
+        None if pd.isna(latest_population) else f"~{int(round(float(latest_population)))}"
+    )
+
+    return SpeciesForecastResponse(
+        species_id=int(row["id"]),
+        common_name=str(row["common_name"]),
+        scientific_name=str(row["binomial"]).replace("_", " "),
+        country=None if pd.isna(row["country"]) else str(row["country"]).title(),
+        status="Endangered",
+        habitat=None if pd.isna(row["t_biome"]) else str(row["t_biome"]),
+        diet="Carnivore",
+        weight=None,
+        population=latest_population_text,
+        units=None if pd.isna(row["units"]) else str(row["units"]),
+        risk_score=71,
+        latitude=None if pd.isna(row["latitude"]) else float(row["latitude"]),
+        longitude=None if pd.isna(row["longitude"]) else float(row["longitude"]),
+        forecast_origin_year=origin_year,
+        forecast_horizon_years=HORIZONS,
+        forecast=[combined[year] for year in sorted(combined)],
+    )
+
+
 # ── Endpoints ──────────────────────────────────────────────────────────────────
 
 
@@ -89,12 +237,6 @@ def predict_country(
         float,
         Query(description="Rolling mean of log-population over last 3 observations"),
     ],
-    latitude: Annotated[
-        float | None, Query(description="Latitude of the population or aggregate")
-    ] = None,
-    longitude: Annotated[
-        float | None, Query(description="Longitude of the population or aggregate")
-    ] = None,
     latitude: Annotated[
         float | None, Query(description="Latitude of the population or aggregate")
     ] = None,
@@ -177,6 +319,12 @@ def predict_aggregated(
         float,
         Query(description="Rolling mean of log-population over last 3 observations"),
     ],
+    latitude: Annotated[
+        float | None, Query(description="Latitude of the population or aggregate")
+    ] = None,
+    longitude: Annotated[
+        float | None, Query(description="Longitude of the population or aggregate")
+    ] = None,
     year_gap_from_prev: Annotated[
         float, Query(description="Years since previous observation")
     ] = 1.0,
@@ -238,6 +386,19 @@ def predict_aggregated(
         return PredictionResponse(
             predictions=_predict_all_horizons(agg_models, row, year)
         )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(
+    "/species/demo",
+    response_model=SpeciesForecastResponse,
+    summary="Demo species forecast for dashboard integration",
+    description="Returns historical and forecasted data for one species taken from the terrestrial strict forecasting dataset.",
+)
+def species_demo() -> SpeciesForecastResponse:
+    try:
+        return _build_supported_species_forecast()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -36,15 +36,49 @@ Then open and execute the notebooks with your preferred Jupyter workflow.
 
 ### API
 
-The API code lives in `api/`.
+The API entrypoint is `api/main.py` and uses FastAPI + Uvicorn.
 
-If you want to work on the API locally, first activate the virtual environment:
+#### Start the API locally
+
+From the repository root:
 
 ```bash
 source .venv/bin/activate
+uvicorn api.main:app --reload
 ```
 
-Then run the API entrypoint according to the implementation in `api/`.
+The API will usually be available at:
+
+```bash
+http://127.0.0.1:8000
+```
+
+#### Useful API endpoints
+
+- Health check: `GET /health`
+- Country forecast: `GET /predict/country`
+- Aggregated forecast: `GET /predict/aggregated`
+- OpenAPI docs: `GET /docs`
+
+Examples:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+```bash
+curl "http://127.0.0.1:8000/docs"
+```
+
+#### API prerequisites
+
+The API loads trained model artifacts from:
+
+```bash
+data/models/
+```
+
+Make sure the expected `.joblib` model files exist there before starting the API.
 
 ## Running the UI Dashboard
 
@@ -84,7 +118,7 @@ npm run lint
 
 ## Quick Start
 
-If you only want to run the dashboard UI:
+### Run the UI only
 
 ```bash
 cd ui
@@ -92,10 +126,11 @@ npm install
 npm run dev
 ```
 
-If you want to work on the Python side:
+### Run the API only
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+uvicorn api.main:app --reload
 ```
