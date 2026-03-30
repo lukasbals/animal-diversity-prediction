@@ -5,6 +5,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 # ── Model loading ──────────────────────────────────────────────────────────────
@@ -40,6 +41,17 @@ app = FastAPI(
     title="Animal Diversity Prediction API",
     description="Returns population forecasts for all horizons (3, 5, 10, 15, 20 years).",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ── Shared response schema ─────────────────────────────────────────────────────
