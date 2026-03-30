@@ -2,17 +2,17 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Popover from "@radix-ui/react-popover";
-import * as Progress from "@radix-ui/react-progress";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import * as Select from "@radix-ui/react-select";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
 import {
   Area,
   AreaChart,
   CartesianGrid,
-  Cell,
   Line,
+  Cell,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -21,7 +21,6 @@ import {
   YAxis,
 } from "recharts";
 import {
-  ArrowUpRight,
   ChevronDown,
   ChevronRight,
   CircleAlert,
@@ -29,15 +28,38 @@ import {
   Info,
   MapPin,
 } from "lucide-react";
-import {
-  forecastData,
-  mapMarkers,
-  references,
-  similarSpecies,
-  speciesOverview,
-  threats,
-} from "@/components/dashboard/data";
+import { mapMarkers, references, similarSpecies } from "@/components/dashboard/data";
 import { DashboardCard } from "@/components/dashboard/card";
+
+type ForecastPoint = {
+  year: number;
+  historical?: number | null;
+  projected?: number | null;
+  lower?: number | null;
+  upper?: number | null;
+};
+
+type SpeciesForecastResponse = {
+  species_id: number;
+  common_name: string;
+  scientific_name: string;
+  country?: string | null;
+  status: string;
+  habitat?: string | null;
+  diet?: string | null;
+  weight?: string | null;
+  population?: string | null;
+  units?: string | null;
+  risk_score: number;
+  latitude?: number | null;
+  longitude?: number | null;
+  forecast_origin_year: number;
+  forecast_horizon_years: number[];
+  forecast: ForecastPoint[];
+};
+
+const speciesImage =
+  "https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=1200&q=80";
 
 function RiskGauge({ value }: { value: number }) {
   const circumference = 2 * Math.PI * 52;
@@ -72,10 +94,10 @@ function RiskGauge({ value }: { value: number }) {
   );
 }
 
-function ForecastChart() {
+function ForecastChart({ data }: { data: ForecastPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={300} minWidth={200}>
-      <AreaChart data={forecastData} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
+      <AreaChart data={data} margin={{ top: 8, right: 4, left: -20, bottom: 0 }}>
         <defs>
           <linearGradient id="forecastBand" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#fb923c" stopOpacity={0.34} />
@@ -92,8 +114,8 @@ function ForecastChart() {
             borderRadius: 18,
           }}
         />
-        <Area type="monotone" dataKey="upper" stroke="transparent" fill="url(#forecastBand)" />
-        <Area type="monotone" dataKey="lower" stroke="transparent" fill="#020617" />
+        <Area type="monotone" dataKey="upper" stroke="transparent" fill="url(#forecastBand)" connectNulls />
+        <Area type="monotone" dataKey="lower" stroke="transparent" fill="#020617" connectNulls />
         <Line
           type="monotone"
           dataKey="historical"
@@ -116,16 +138,18 @@ function ForecastChart() {
   );
 }
 
-function DriverMix() {
-  const chartData = threats.map((threat) => ({
-    name: threat.label,
-    value: threat.value,
-  }));
-  const colors = ["#f97316", "#fb923c", "#facc15", "#84cc16", "#22c55e"];
+function ForecastMix({ data }: { data: ForecastPoint[] }) {
+  const latestHistorical = [...data].reverse().find((point) => point.historical != null)?.historical ?? 0;
+  const latestProjected = [...data].reverse().find((point) => point.projected != null)?.projected ?? 0;
+  const chartData = [
+    { name: "Current", value: Math.max(Number(latestHistorical) || 0, 1) },
+    { name: "Projected", value: Math.max(Number(latestProjected) || 0, 1) },
+  ];
+  const colors = ["#22c55e", "#f97316"];
 
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-      <p className="text-xs uppercase tracking-[0.24em] text-mutedText">Driver mix</p>
+      <p className="text-xs uppercase tracking-[0.24em] text-mutedText">Current vs forecast</p>
       <div className="mt-4 h-40 min-w-0">
         <ResponsiveContainer width="100%" height="100%" minWidth={120}>
           <PieChart>
@@ -148,7 +172,7 @@ function DriverMix() {
   );
 }
 
-function MapSection() {
+function MapSection({ selectedSpeciesName, riskScore }: { selectedSpeciesName: string; riskScore: number }) {
   return (
     <DashboardCard className="overflow-hidden p-0">
       <div className="flex flex-col gap-4 border-b border-white/10 px-6 py-5 md:flex-row md:items-center md:justify-between">
@@ -168,43 +192,101 @@ function MapSection() {
         <div className="absolute left-[8%] top-[14%] rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-200">
           14 monitored clusters
         </div>
-        {mapMarkers.map((marker) => (
-          <Popover.Root key={marker.id}>
-            <Popover.Trigger asChild>
-              <button
-                className={`absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border text-white shadow-lg transition hover:scale-105 ${
-                  marker.highlighted
-                    ? "border-red-300 bg-red-500"
-                    : "border-white/15 bg-slate-900/90"
-                }`}
-                style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
-                aria-label={`View ${marker.species} population details`}
-              >
-                <MapPin className="h-5 w-5" />
-              </button>
-            </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Content
-                sideOffset={16}
-                className="z-50 w-72 rounded-3xl border border-white/10 bg-slate-950/95 p-5 shadow-glow"
-              >
-                <p className="text-lg font-semibold text-white">{marker.species}</p>
-                <p className="mt-1 text-sm text-slate-300">Status: {marker.status}</p>
-                <p className="mt-3 text-sm text-mutedText">Decline Risk: {marker.risk}%</p>
-                <button className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-slate-200">
-                  VIEW DETAILS <ChevronRight className="h-4 w-4" />
+        {mapMarkers.map((marker) => {
+          const isSelected = marker.species === selectedSpeciesName;
+          return (
+            <Popover.Root key={marker.id}>
+              <Popover.Trigger asChild>
+                <button
+                  className={`absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border text-white shadow-lg transition hover:scale-105 ${
+                    isSelected || marker.highlighted
+                      ? "border-red-300 bg-red-500"
+                      : "border-white/15 bg-slate-900/90"
+                  }`}
+                  style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
+                  aria-label={`View ${marker.species} population details`}
+                >
+                  <MapPin className="h-5 w-5" />
                 </button>
-                <Popover.Arrow className="fill-slate-950" />
-              </Popover.Content>
-            </Popover.Portal>
-          </Popover.Root>
-        ))}
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Content
+                  sideOffset={16}
+                  className="z-50 w-72 rounded-3xl border border-white/10 bg-slate-950/95 p-5 shadow-glow"
+                >
+                  <p className="text-lg font-semibold text-white">{marker.species}</p>
+                  <p className="mt-1 text-sm text-slate-300">
+                    Status: {isSelected ? "Endangered" : marker.status}
+                  </p>
+                  <p className="mt-3 text-sm text-mutedText">
+                    Decline Risk: {isSelected ? riskScore : marker.risk}%
+                  </p>
+                  <button className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-slate-200">
+                    VIEW DETAILS <ChevronRight className="h-4 w-4" />
+                  </button>
+                  <Popover.Arrow className="fill-slate-950" />
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
+          );
+        })}
       </div>
     </DashboardCard>
   );
 }
 
 export function DashboardShell() {
+  const [forecastHorizon, setForecastHorizon] = useState("20");
+  const [species, setSpecies] = useState<SpeciesForecastResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadSpecies() {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/species/demo", {
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to load forecast data: ${response.status}`);
+        }
+        const payload = (await response.json()) as SpeciesForecastResponse;
+        setSpecies(payload);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load forecast data");
+      }
+    }
+
+    loadSpecies();
+  }, []);
+
+  const filteredForecast = useMemo(() => {
+    if (!species) {
+      return [];
+    }
+    const maxYear = species.forecast_origin_year + Number(forecastHorizon);
+    return species.forecast.filter((point) => point.year <= maxYear);
+  }, [species, forecastHorizon]);
+
+  const displaySpecies = species ?? {
+    species_id: 27565,
+    common_name: "Wolverine",
+    scientific_name: "Gulo gulo",
+    country: "Sweden",
+    status: "Endangered",
+    habitat: "Boreal forests/taiga",
+    diet: "Carnivore",
+    weight: null,
+    population: null,
+    units: "estimated number of individuals",
+    risk_score: 71,
+    latitude: 64.444593,
+    longitude: 15.165737,
+    forecast_origin_year: 2020,
+    forecast_horizon_years: [3, 5, 10, 15, 20],
+    forecast: [],
+  } satisfies SpeciesForecastResponse;
+
   return (
     <Tooltip.Provider>
       <div className="min-h-screen bg-grid px-6 py-8 text-white md:px-10 xl:px-14">
@@ -239,9 +321,10 @@ export function DashboardShell() {
                     Info on algorithms
                   </Dialog.Title>
                   <p className="mt-4 text-sm leading-7 text-slate-300">
-                    The dashboard combines historical biodiversity observations, risk-driver scoring,
-                    and uncertainty-aware forecasting to surface likely population decline patterns.
-                    Confidence intervals are shown to communicate uncertainty around projections.
+                    The dashboard combines historical biodiversity observations, backend-served model
+                    predictions, and uncertainty-aware forecasting to surface likely population
+                    decline patterns. Confidence intervals are shown to communicate uncertainty
+                    around projections.
                   </p>
                   <a
                     href="https://github.com/lukasbals/animal-diversity-prediction"
@@ -256,35 +339,42 @@ export function DashboardShell() {
             </Dialog.Root>
           </header>
 
-          <div className="grid gap-6 xl:grid-cols-[1.05fr_1.55fr_1fr]">
+          {error ? (
+            <div className="rounded-3xl border border-red-400/30 bg-red-500/10 px-5 py-4 text-sm text-red-100">
+              Failed to load backend forecast data: {error}
+            </div>
+          ) : null}
+
+          <div className="grid gap-6 xl:grid-cols-[1.05fr_1.95fr]">
             <DashboardCard className="space-y-5">
               <div className="relative h-64 overflow-hidden rounded-[24px]">
                 <Image
-                  src={speciesOverview.image}
-                  alt={speciesOverview.commonName}
+                  src={speciesImage}
+                  alt={displaySpecies.common_name}
                   fill
                   className="object-cover"
                   priority
                 />
               </div>
               <div>
-                <h2 className="text-3xl font-semibold text-white">{speciesOverview.commonName}</h2>
+                <h2 className="text-3xl font-semibold text-white">{displaySpecies.common_name}</h2>
                 <p className="mt-1 text-base italic text-slate-300">
-                  {speciesOverview.scientificName}
+                  {displaySpecies.scientific_name}
                 </p>
               </div>
               <div className="inline-flex w-fit rounded-full border border-orange-400/30 bg-orange-500/15 px-4 py-2 text-sm font-medium text-orange-200">
-                Status: {speciesOverview.status}
+                Status: {displaySpecies.status}
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
                 <p className="text-sm font-medium uppercase tracking-[0.24em] text-mutedText">
                   Quick facts
                 </p>
                 <ul className="mt-4 space-y-3 text-sm text-slate-200">
-                  <li>• Habitat: {speciesOverview.habitat}</li>
-                  <li>• Diet: {speciesOverview.diet}</li>
-                  <li>• Weight: {speciesOverview.weight}</li>
-                  <li>• Population: {speciesOverview.population}</li>
+                  <li>• Habitat: {displaySpecies.habitat ?? "Unknown"}</li>
+                  <li>• Diet: {displaySpecies.diet ?? "Unknown"}</li>
+                  <li>• Population: {displaySpecies.population ?? "Unknown"}</li>
+                  <li>• Country: {displaySpecies.country ?? "Unknown"}</li>
+                  <li>• Units: {displaySpecies.units ?? "Unknown"}</li>
                 </ul>
               </div>
             </DashboardCard>
@@ -296,14 +386,14 @@ export function DashboardShell() {
                     <div>
                       <h2 className="text-2xl font-semibold text-white">Extinction Risk Forecast</h2>
                       <p className="mt-1 text-sm text-mutedText">
-                        Population Trend &amp; Projection with uncertainty intervals.
+                        Population trend loaded from the backend API for one demo species.
                       </p>
                     </div>
                     <div className="min-w-[180px]">
                       <p className="mb-2 text-xs uppercase tracking-[0.24em] text-mutedText">
                         Forecast Horizon (max 20 years)
                       </p>
-                      <Select.Root defaultValue="20">
+                      <Select.Root value={forecastHorizon} onValueChange={setForecastHorizon}>
                         <Select.Trigger className="inline-flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white">
                           <Select.Value />
                           <Select.Icon>
@@ -328,45 +418,20 @@ export function DashboardShell() {
                       </Select.Root>
                     </div>
                   </div>
-                  <ForecastChart />
+                  <ForecastChart data={filteredForecast} />
                 </div>
-                <RiskGauge value={85} />
-              </div>
-            </DashboardCard>
-
-            <DashboardCard>
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-semibold text-white">Threats &amp; Risk Drivers</h2>
-                  <p className="mt-1 text-sm text-mutedText">
-                    Climate and anthropogenic pressures driving extinction risk.
-                  </p>
+                <div className="flex flex-col gap-4">
+                  <RiskGauge value={displaySpecies.risk_score} />
+                  <ForecastMix data={filteredForecast} />
                 </div>
-                <ArrowUpRight className="mt-1 h-5 w-5 text-mutedText" />
-              </div>
-              <div className="mt-6 space-y-4">
-                {threats.map((threat) => (
-                  <div key={threat.label} className="space-y-2 rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="flex items-center justify-between gap-4 text-sm">
-                      <span className="text-slate-100">{threat.label}</span>
-                      <span className="font-medium text-orange-200">{threat.value}%</span>
-                    </div>
-                    <Progress.Root className="relative h-2 overflow-hidden rounded-full bg-slate-800">
-                      <Progress.Indicator
-                        className="h-full rounded-full bg-gradient-to-r from-accent via-warning to-danger transition-all"
-                        style={{ width: `${threat.value}%` }}
-                      />
-                    </Progress.Root>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6">
-                <DriverMix />
               </div>
             </DashboardCard>
           </div>
 
-          <MapSection />
+          <MapSection
+            selectedSpeciesName={displaySpecies.common_name}
+            riskScore={displaySpecies.risk_score}
+          />
 
           <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
             <DashboardCard>
@@ -454,10 +519,7 @@ export function DashboardShell() {
             >
               Ethical Framework
             </a>
-            <a
-              href="#references"
-              className="transition hover:text-white"
-            >
+            <a href="#references" className="transition hover:text-white">
               References / Data Sources
             </a>
           </footer>
