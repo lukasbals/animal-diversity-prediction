@@ -181,29 +181,15 @@ def _build_supported_species_forecast() -> SpeciesForecastResponse:
                 ForecastPoint(year=year, historical=round(float(value), 4))
             )
 
-    sorted_predictions = sorted(predictions, key=lambda prediction: prediction.target_year)
-    forecast_points: list[ForecastPoint] = []
-    previous_year = origin_year
-    previous_value = float(row[str(origin_year)])
-
-    for prediction in sorted_predictions:
-        steps = prediction.target_year - previous_year
-        yearly_delta = (prediction.predicted_population - previous_value) / steps
-
-        for step in range(1, steps + 1):
-            year = previous_year + step
-            interpolated = round(previous_value + yearly_delta * step, 4)
-            forecast_points.append(
-                ForecastPoint(
-                    year=year,
-                    projected=interpolated,
-                    lower=round(interpolated * 0.88, 4),
-                    upper=round(interpolated * 1.12, 4),
-                )
-            )
-
-        previous_year = prediction.target_year
-        previous_value = prediction.predicted_population
+    forecast_points = [
+        ForecastPoint(
+            year=prediction.target_year,
+            projected=prediction.predicted_population,
+            lower=round(prediction.predicted_population * 0.88, 4),
+            upper=round(prediction.predicted_population * 1.12, 4),
+        )
+        for prediction in predictions
+    ]
 
     combined: dict[int, ForecastPoint] = {point.year: point for point in historical_points}
     for point in forecast_points:
