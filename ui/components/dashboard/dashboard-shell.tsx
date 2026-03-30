@@ -5,14 +5,15 @@ import * as Popover from "@radix-ui/react-popover";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import * as Select from "@radix-ui/react-select";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { geoCentroid } from "d3-geo";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import {
   Area,
   AreaChart,
   CartesianGrid,
-  Line,
   Cell,
+  Line,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -20,6 +21,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import {
   ChevronDown,
   ChevronRight,
@@ -28,7 +30,7 @@ import {
   Info,
   MapPin,
 } from "lucide-react";
-import { mapMarkers, references, similarSpecies } from "@/components/dashboard/data";
+import { references } from "@/components/dashboard/data";
 import { DashboardCard } from "@/components/dashboard/card";
 
 type ForecastPoint = {
@@ -58,8 +60,33 @@ type SpeciesForecastResponse = {
   forecast: ForecastPoint[];
 };
 
-const speciesImage =
+type PopulationMapPoint = {
+  population_id: number;
+  common_name: string;
+  scientific_name: string;
+  country?: string | null;
+  status: string;
+  decline_risk: number;
+  latitude: number;
+  longitude: number;
+};
+
+type SpeciesListItem = {
+  species_id: number;
+  common_name: string;
+  scientific_name: string;
+  family?: string | null;
+  class_name?: string | null;
+  country?: string | null;
+  habitat?: string | null;
+  decline: string;
+  status: string;
+  image: string;
+};
+
+const FALLBACK_SPECIES_IMAGE =
   "https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=1200&q=80";
+const WORLD_TOPOJSON = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 function RiskGauge({ value }: { value: number }) {
   const circumference = 2 * Math.PI * 52;
@@ -172,64 +199,108 @@ function ForecastMix({ data }: { data: ForecastPoint[] }) {
   );
 }
 
-function MapSection({ selectedSpeciesName, riskScore }: { selectedSpeciesName: string; riskScore: number }) {
+function EndangeredSpeciesMap({
+  populations,
+  selectedPopulationId,
+  onSelectPopulation,
+}: {
+  populations: PopulationMapPoint[];
+  selectedPopulationId: number | null;
+  onSelectPopulation: (populationId: number) => void;
+}) {
   return (
     <DashboardCard className="overflow-hidden p-0">
       <div className="flex flex-col gap-4 border-b border-white/10 px-6 py-5 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-xl font-semibold text-white">Endangered Species Map</h2>
           <p className="mt-1 text-sm text-mutedText">
-            Population markers with a highlighted selected population and quick overview popups.
+            Real population coordinates from the dataset. Hover for names, click to switch the dashboard species.
           </p>
         </div>
         <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.24em] text-slate-300">
-          Global population view
+          {populations.length} mapped populations
         </div>
       </div>
-      <div className="map-grid world-glow relative h-[440px] overflow-hidden">
-        <div className="absolute inset-x-10 top-16 h-48 rounded-[50%] border border-white/10 bg-white/5 blur-[1px]" />
-        <div className="absolute inset-x-24 bottom-12 h-40 rounded-[48%] border border-white/10 bg-white/5 blur-[1px]" />
-        <div className="absolute left-[8%] top-[14%] rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-200">
-          14 monitored clusters
-        </div>
-        {mapMarkers.map((marker) => {
-          const isSelected = marker.species === selectedSpeciesName;
-          return (
-            <Popover.Root key={marker.id}>
-              <Popover.Trigger asChild>
-                <button
-                  className={`absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border text-white shadow-lg transition hover:scale-105 ${
-                    isSelected || marker.highlighted
-                      ? "border-red-300 bg-red-500"
-                      : "border-white/15 bg-slate-900/90"
-                  }`}
-                  style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
-                  aria-label={`View ${marker.species} population details`}
-                >
-                  <MapPin className="h-5 w-5" />
-                </button>
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Content
-                  sideOffset={16}
-                  className="z-50 w-72 rounded-3xl border border-white/10 bg-slate-950/95 p-5 shadow-glow"
-                >
-                  <p className="text-lg font-semibold text-white">{marker.species}</p>
-                  <p className="mt-1 text-sm text-slate-300">
-                    Status: {isSelected ? "Endangered" : marker.status}
-                  </p>
-                  <p className="mt-3 text-sm text-mutedText">
-                    Decline Risk: {isSelected ? riskScore : marker.risk}%
-                  </p>
-                  <button className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-slate-200">
+      <div className="world-glow relative h-[480px] overflow-hidden bg-slate-950/70 px-3 py-4">
+        <ComposableMap
+          projection="geoMercator"
+          projectionConfig={{ scale: 120 }}
+          style={{ width: "100%", height: "100%" }}
+        >
+          <Geographies geography={WORLD_TOPOJSON}>
+            {({ geographies }: { geographies: Array<{ rsmKey: string; [key: string]: unknown }> }) =>
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill="#0f172a"
+                  stroke="rgba(148,163,184,0.18)"
+                  strokeWidth={0.5}
+                  style={{
+                    default: { outline: "none" },
+                    hover: { outline: "none", fill: "#132036" },
+                    pressed: { outline: "none" },
+                  }}
+                />
+              ))
+            }
+          </Geographies>
+
+          {populations.map((population) => {
+            const isSelected = population.population_id === selectedPopulationId;
+            return (
+              <Marker
+                key={population.population_id}
+                coordinates={[population.longitude, population.latitude]}
+              >
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <g
+                      onClick={() => onSelectPopulation(population.population_id)}
+                      className="cursor-pointer"
+                    >
+                      <circle
+                        r={isSelected ? 7 : 5}
+                        fill={isSelected ? "#ef4444" : "#f97316"}
+                        stroke="#fff"
+                        strokeWidth={1.5}
+                      />
+                    </g>
+                  </Tooltip.Trigger>
+                  <Tooltip.Portal>
+                    <Tooltip.Content className="rounded-full border border-white/10 bg-slate-950 px-3 py-2 text-xs text-slate-200">
+                      {population.common_name}
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                </Tooltip.Root>
+              </Marker>
+            );
+          })}
+        </ComposableMap>
+
+        {selectedPopulationId ? (
+          <div className="absolute bottom-5 left-5 w-72 rounded-3xl border border-white/10 bg-slate-950/90 p-4 shadow-glow">
+            {(() => {
+              const selected = populations.find((population) => population.population_id === selectedPopulationId);
+              if (!selected) {
+                return null;
+              }
+              return (
+                <>
+                  <p className="text-lg font-semibold text-white">{selected.common_name}</p>
+                  <p className="mt-1 text-sm text-slate-300">Status: {selected.status}</p>
+                  <p className="mt-2 text-sm text-mutedText">Decline Risk: {selected.decline_risk}%</p>
+                  <button
+                    onClick={() => onSelectPopulation(selected.population_id)}
+                    className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-slate-200"
+                  >
                     VIEW DETAILS <ChevronRight className="h-4 w-4" />
                   </button>
-                  <Popover.Arrow className="fill-slate-950" />
-                </Popover.Content>
-              </Popover.Portal>
-            </Popover.Root>
-          );
-        })}
+                </>
+              );
+            })()}
+          </div>
+        ) : null}
       </div>
     </DashboardCard>
   );
@@ -238,27 +309,49 @@ function MapSection({ selectedSpeciesName, riskScore }: { selectedSpeciesName: s
 export function DashboardShell() {
   const [forecastHorizon, setForecastHorizon] = useState("20");
   const [species, setSpecies] = useState<SpeciesForecastResponse | null>(null);
+  const [speciesList, setSpeciesList] = useState<SpeciesListItem[]>([]);
+  const [populations, setPopulations] = useState<PopulationMapPoint[]>([]);
+  const [selectedPopulationId, setSelectedPopulationId] = useState<number | null>(27565);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadSpecies() {
+    async function bootstrap() {
       try {
-        const response = await fetch("http://127.0.0.1:8000/species/demo", {
-          cache: "no-store",
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to load forecast data: ${response.status}`);
+        const [speciesResponse, listResponse, mapResponse] = await Promise.all([
+          fetch(`http://127.0.0.1:8000/species/demo?species_id=${selectedPopulationId ?? 27565}`, {
+            cache: "no-store",
+          }),
+          fetch("http://127.0.0.1:8000/species", { cache: "no-store" }),
+          fetch("http://127.0.0.1:8000/populations/map", { cache: "no-store" }),
+        ]);
+
+        if (!speciesResponse.ok) {
+          throw new Error(`Failed to load species forecast: ${speciesResponse.status}`);
         }
-        const payload = (await response.json()) as SpeciesForecastResponse;
-        setSpecies(payload);
+        if (!listResponse.ok) {
+          throw new Error(`Failed to load species list: ${listResponse.status}`);
+        }
+        if (!mapResponse.ok) {
+          throw new Error(`Failed to load map populations: ${mapResponse.status}`);
+        }
+
+        const [speciesPayload, listPayload, mapPayload] = await Promise.all([
+          speciesResponse.json() as Promise<SpeciesForecastResponse>,
+          listResponse.json() as Promise<SpeciesListItem[]>,
+          mapResponse.json() as Promise<PopulationMapPoint[]>,
+        ]);
+
+        setSpecies(speciesPayload);
+        setSpeciesList(listPayload);
+        setPopulations(mapPayload);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load forecast data");
+        setError(err instanceof Error ? err.message : "Failed to load dashboard data");
       }
     }
 
-    loadSpecies();
-  }, []);
+    bootstrap();
+  }, [selectedPopulationId]);
 
   const filteredForecast = useMemo(() => {
     if (!species) {
@@ -303,10 +396,30 @@ export function DashboardShell() {
       upper: originPoint.historical ?? null,
     };
 
-    const merged = [...baseForecast.filter((point) => point.year !== species.forecast_origin_year), projectedOriginPoint, ...bridgedPoints].sort((a, b) => a.year - b.year);
+    const merged = [
+      ...baseForecast.filter((point) => point.year !== species.forecast_origin_year),
+      projectedOriginPoint,
+      ...bridgedPoints,
+    ].sort((a, b) => a.year - b.year);
 
     return merged;
   }, [species, forecastHorizon]);
+
+  const similarSpecies = useMemo(() => {
+    if (!species) {
+      return speciesList.slice(0, 4);
+    }
+
+    return speciesList
+      .filter((item) => item.species_id !== species.species_id)
+      .filter(
+        (item) =>
+          item.family === species.scientific_name.split(" ")[0] ||
+          item.class_name === "Mammalia" ||
+          item.habitat === species.habitat,
+      )
+      .slice(0, 6);
+  }, [species, speciesList]);
 
   const displaySpecies = species ?? {
     species_id: 27565,
@@ -326,6 +439,9 @@ export function DashboardShell() {
     forecast_horizon_years: [3, 5, 10, 15, 20],
     forecast: [],
   } satisfies SpeciesForecastResponse;
+
+  const currentSpeciesCard = speciesList.find((item) => item.species_id === displaySpecies.species_id);
+  const currentSpeciesImage = currentSpeciesCard?.image ?? FALLBACK_SPECIES_IMAGE;
 
   return (
     <Tooltip.Provider>
@@ -389,7 +505,7 @@ export function DashboardShell() {
             <DashboardCard className="space-y-5">
               <div className="relative h-64 overflow-hidden rounded-[24px]">
                 <Image
-                  src={speciesImage}
+                  src={currentSpeciesImage}
                   alt={displaySpecies.common_name}
                   fill
                   className="object-cover"
@@ -426,7 +542,7 @@ export function DashboardShell() {
                     <div>
                       <h2 className="text-2xl font-semibold text-white">Extinction Risk Forecast</h2>
                       <p className="mt-1 text-sm text-mutedText">
-                        Population trend loaded from the backend API for one demo species.
+                        Population trend loaded from the backend API for the selected population.
                       </p>
                     </div>
                     <div className="min-w-[180px]">
@@ -468,9 +584,10 @@ export function DashboardShell() {
             </DashboardCard>
           </div>
 
-          <MapSection
-            selectedSpeciesName={displaySpecies.common_name}
-            riskScore={displaySpecies.risk_score}
+          <EndangeredSpeciesMap
+            populations={populations}
+            selectedPopulationId={selectedPopulationId}
+            onSelectPopulation={setSelectedPopulationId}
           />
 
           <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
@@ -479,7 +596,7 @@ export function DashboardShell() {
                 <div>
                   <h2 className="text-2xl font-semibold text-white">Similar Species</h2>
                   <p className="mt-1 text-sm text-mutedText">
-                    Similar species by genus, class, family, and observed risk pattern.
+                    Species list loaded live from the backend dataset endpoint.
                   </p>
                 </div>
                 <CircleAlert className="h-5 w-5 text-mutedText" />
@@ -487,20 +604,21 @@ export function DashboardShell() {
               <ScrollArea.Root className="mt-6 whitespace-nowrap">
                 <ScrollArea.Viewport>
                   <div className="flex gap-4 pb-4">
-                    {similarSpecies.map((species) => (
-                      <article
-                        key={species.name}
-                        className="flex min-w-[280px] items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4"
+                    {similarSpecies.map((item) => (
+                      <button
+                        key={item.species_id}
+                        onClick={() => setSelectedPopulationId(item.species_id)}
+                        className="flex min-w-[300px] items-center gap-4 rounded-[24px] border border-white/10 bg-white/5 p-4 text-left transition hover:bg-white/10"
                       >
                         <div className="relative h-20 w-20 overflow-hidden rounded-2xl">
-                          <Image src={species.image} alt={species.name} fill className="object-cover" />
+                          <Image src={item.image} alt={item.common_name} fill className="object-cover" />
                         </div>
                         <div className="space-y-1">
-                          <p className="text-lg font-semibold text-white">{species.name}</p>
-                          <p className="text-sm text-orange-200">{species.status}</p>
-                          <p className="text-sm text-slate-300">{species.decline}</p>
+                          <p className="text-lg font-semibold text-white">{item.common_name}</p>
+                          <p className="text-sm text-orange-200">{item.status}</p>
+                          <p className="text-sm text-slate-300">{item.decline}</p>
                         </div>
-                      </article>
+                      </button>
                     ))}
                   </div>
                 </ScrollArea.Viewport>

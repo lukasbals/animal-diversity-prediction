@@ -34,6 +34,7 @@ def _load_models(prefix: str) -> dict[int, object]:
 
 country_models = _load_models("country")
 agg_models = _load_models("agg")
+_dataset_cache: pd.DataFrame | None = None
 
 # ── App ────────────────────────────────────────────────────────────────────────
 
@@ -96,6 +97,30 @@ class SpeciesForecastResponse(BaseModel):
     forecast: list[ForecastPoint]
 
 
+class PopulationMapPoint(BaseModel):
+    population_id: int
+    common_name: str
+    scientific_name: str
+    country: str | None = None
+    status: str
+    decline_risk: int
+    latitude: float
+    longitude: float
+
+
+class SpeciesListItem(BaseModel):
+    species_id: int
+    common_name: str
+    scientific_name: str
+    family: str | None = None
+    class_name: str | None = Field(default=None, alias="class_name")
+    country: str | None = None
+    habitat: str | None = None
+    decline: str
+    status: str
+    image: str
+
+
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 
@@ -116,16 +141,75 @@ def _predict_all_horizons(
     return results
 
 
-def _load_supported_species_row() -> pd.Series:
-    if not DATASET_PATH.exists():
-        raise RuntimeError(f"Dataset file not found: {DATASET_PATH}")
+def _load_dataset() -> pd.DataFrame:
+    global _dataset_cache
 
-    df = pd.read_csv(DATASET_PATH)
+    if _dataset_cache is None:
+        if not DATASET_PATH.exists():
+            raise RuntimeError(f"Dataset file not found: {DATASET_PATH}")
+        _dataset_cache = pd.read_csv(DATASET_PATH)
+
+    return _dataset_cache.copy()
+
+
+def _risk_score_from_row(row: pd.Series) -> int:
+    origin_year = int(row["last_obs_year"])
+    current = row.get(str(origin_year))
+    previous = row.get(str(origin_year - 3))
+
+    if pd.isna(current) or pd.isna(previous) or float(previous) <= 0:
+        return 50
+
+    decline_ratio = 1 - min(float(current) / float(previous), 1.5)
+    score = int(round(max(15, min(95, 55 + decline_ratio * 100))))
+    return score
+
+
+def _status_from_risk(score: int) -> str:
+    if score >= 85:
+        return "Critically Endangered"
+    if score >= 70:
+        return "Endangered"
+    if score >= 55:
+        return "Vulnerable"
+    return "Watchlist"
+
+
+def _species_image(common_name: str) -> str:
+    image_map = {
+        "Wolverine": "https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=1200&q=80",
+        "Moose": "https://images.unsplash.com/photo-1501706362039-c6e80948e4ca?auto=format&fit=crop&w=1200&q=80",
+        "Mountain Pygmy-possum": "https://images.unsplash.com/photo-1500479694472-551d1fb6258d?auto=format&fit=crop&w=1200&q=80",
+        "Leadbeater's Possum": "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=1200&q=80",
+        "Yellow-footed Rock-wallaby": "https://images.unsplash.com/photo-1466721591366-2d5fba72006d?auto=format&fit=crop&w=1200&q=80",
+        "Malleefowl": "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=1200&q=80",
+        "Helmeted Honeyeater": "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=1200&q=80",
+        "Plains-wanderer": "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=1200&q=80",
+    }
+    return image_map.get(
+        common_name,
+        "https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=1200&q=80",
+    )
+
+
+def _find_species_row(species_id: int | None = None, common_name: str | None = None) -> pd.Series:
+    df = _load_dataset()
+
+    if species_id is not None:
+        matches = df.loc[df["id"] == species_id]
+        if matches.empty:
+            raise HTTPException(status_code=404, detail=f"Species row not found: {species_id}")
+        return matches.iloc[0]
+
+    if common_name is not None:
+        matches = df.loc[df["common_name"].fillna("").str.lower() == common_name.lower()]
+        if matches.empty:
+            raise HTTPException(status_code=404, detail=f"Species not found: {common_name}")
+        return matches.iloc[0]
+
     matches = df.loc[df["id"] == SUPPORTED_SPECIES_ROW_ID]
     if matches.empty:
-        raise RuntimeError(
-            f"Supported species row not found in dataset: {SUPPORTED_SPECIES_ROW_ID}"
-        )
+        raise HTTPException(status_code=404, detail="Default species row not found")
     return matches.iloc[0]
 
 
@@ -168,8 +252,7 @@ def _build_country_feature_row(row: pd.Series) -> tuple[pd.DataFrame, int]:
     return feature_row, origin_year
 
 
-def _build_supported_species_forecast() -> SpeciesForecastResponse:
-    row = _load_supported_species_row()
+def _build_species_forecast(row: pd.Series) -> SpeciesForecastResponse:
     feature_row, origin_year = _build_country_feature_row(row)
     predictions = _predict_all_horizons(country_models, feature_row, origin_year)
 
@@ -209,25 +292,82 @@ def _build_supported_species_forecast() -> SpeciesForecastResponse:
     latest_population_text = (
         None if pd.isna(latest_population) else f"~{int(round(float(latest_population)))}"
     )
+    risk_score = _risk_score_from_row(row)
 
     return SpeciesForecastResponse(
         species_id=int(row["id"]),
         common_name=str(row["common_name"]),
         scientific_name=str(row["binomial"]).replace("_", " "),
         country=None if pd.isna(row["country"]) else str(row["country"]).title(),
-        status="Endangered",
+        status=_status_from_risk(risk_score),
         habitat=None if pd.isna(row["t_biome"]) else str(row["t_biome"]),
-        diet="Carnivore",
+        diet="Carnivore" if str(row.get("class", "")).lower() == "mammalia" else "Unknown",
         weight=None,
         population=latest_population_text,
         units=None if pd.isna(row["units"]) else str(row["units"]),
-        risk_score=71,
+        risk_score=risk_score,
         latitude=None if pd.isna(row["latitude"]) else float(row["latitude"]),
         longitude=None if pd.isna(row["longitude"]) else float(row["longitude"]),
         forecast_origin_year=origin_year,
         forecast_horizon_years=HORIZONS,
         forecast=[combined[year] for year in sorted(combined)],
     )
+
+
+def _build_species_list() -> list[SpeciesListItem]:
+    df = _load_dataset()
+    rows = df.sort_values(["common_name", "id"]).drop_duplicates(subset=["common_name"])
+    items: list[SpeciesListItem] = []
+
+    for _, row in rows.iterrows():
+        origin_year = int(row["last_obs_year"])
+        current_value = row.get(str(origin_year))
+        previous_value = row.get(str(origin_year - 3))
+
+        decline = "Population trend unavailable"
+        if pd.notna(current_value) and pd.notna(previous_value) and float(previous_value) > 0:
+            change = ((float(current_value) - float(previous_value)) / float(previous_value)) * 100
+            decline = f"Population Change: {change:+.0f}%"
+
+        risk_score = _risk_score_from_row(row)
+        items.append(
+            SpeciesListItem(
+                species_id=int(row["id"]),
+                common_name=str(row["common_name"]),
+                scientific_name=str(row["binomial"]).replace("_", " "),
+                family=None if pd.isna(row["family"]) else str(row["family"]),
+                class_name=None if pd.isna(row["class"]) else str(row["class"]),
+                country=None if pd.isna(row["country"]) else str(row["country"]).title(),
+                habitat=None if pd.isna(row["t_biome"]) else str(row["t_biome"]),
+                decline=decline,
+                status=_status_from_risk(risk_score),
+                image=_species_image(str(row["common_name"])),
+            )
+        )
+
+    return items
+
+
+def _build_population_map() -> list[PopulationMapPoint]:
+    df = _load_dataset()
+    points: list[PopulationMapPoint] = []
+    for _, row in df.iterrows():
+        if pd.isna(row["latitude"]) or pd.isna(row["longitude"]):
+            continue
+        risk_score = _risk_score_from_row(row)
+        points.append(
+            PopulationMapPoint(
+                population_id=int(row["id"]),
+                common_name=str(row["common_name"]),
+                scientific_name=str(row["binomial"]).replace("_", " "),
+                country=None if pd.isna(row["country"]) else str(row["country"]).title(),
+                status=_status_from_risk(risk_score),
+                decline_risk=risk_score,
+                latitude=float(row["latitude"]),
+                longitude=float(row["longitude"]),
+            )
+        )
+    return points
 
 
 # ── Endpoints ──────────────────────────────────────────────────────────────────
@@ -408,9 +548,39 @@ def predict_aggregated(
     summary="Demo species forecast for dashboard integration",
     description="Returns historical and forecasted data for one species taken from the terrestrial strict forecasting dataset.",
 )
-def species_demo() -> SpeciesForecastResponse:
+def species_demo(
+    species_id: Annotated[int | None, Query(description="Population row id to load")] = None,
+    common_name: Annotated[str | None, Query(description="Common species name to load")] = None,
+) -> SpeciesForecastResponse:
     try:
-        return _build_supported_species_forecast()
+        row = _find_species_row(species_id=species_id, common_name=common_name)
+        return _build_species_forecast(row)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(
+    "/species",
+    response_model=list[SpeciesListItem],
+    summary="List species available in the strict terrestrial dataset",
+)
+def list_species() -> list[SpeciesListItem]:
+    try:
+        return _build_species_list()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(
+    "/populations/map",
+    response_model=list[PopulationMapPoint],
+    summary="List geospatial population points for the strict terrestrial dataset",
+)
+def populations_map() -> list[PopulationMapPoint]:
+    try:
+        return _build_population_map()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
