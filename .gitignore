@@ -4,3 +4,6 @@ notebooks/.ipynb_checkpoints/
 __pycache__/
 .DS_Store
 notebooks/TODELETE.ipynb
+data/models/
+notebooks/*_executed.ipynb
+.python-version

@@ -1,13 +1,25 @@
-# Notebook dependencies
-pandas==2.2.2
-scikit-learn==1.5.2
-matplotlib==3.9.2
-matplotlib-venn==1.1.1
-seaborn==0.13.2
-numpy==1.26.4
-scipy==1.13.1
-joblib==1.4.2
-optuna
 
 # Development dependencies
+# Notebook dependencies
+annotated-doc==0.0.4
+annotated-types==0.7.0
+anyio==4.13.0
+black==26.3.1
+click==8.3.1
+fastapi==0.135.2
+h11==0.16.0
 ipykernel==7.1.0
+joblib==1.4.2
+matplotlib-venn==1.1.1
+matplotlib==3.9.2
+nbqa==1.9.1
+numpy==1.26.4
+optuna
+pandas==2.2.2
+pydantic==2.12.5
+pydantic_core==2.41.5
+scikit-learn==1.5.2
+scipy==1.13.1
+seaborn==0.13.2
+starlette==1.0.0
+uvicorn==0.42.0
