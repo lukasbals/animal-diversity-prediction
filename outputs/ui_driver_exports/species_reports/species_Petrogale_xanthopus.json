@@ -1,0 +1,36 @@
+{
+  "entity_type": "species",
+  "entity_id": "Petrogale_xanthopus",
+  "n_data_points": 40,
+  "year_min": 1980,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "temp_change_1y",
+      "category": "climate",
+      "importance_mean": 0.013836351116590965,
+      "contribution_pct": 39.43
+    },
+    {
+      "feature": "precip_anom_country",
+      "category": "climate",
+      "importance_mean": 0.011549275764848304,
+      "contribution_pct": 32.91
+    },
+    {
+      "feature": "precip_mm",
+      "category": "climate",
+      "importance_mean": 0.009707988417969942,
+      "contribution_pct": 27.66
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "species_binomial": "Petrogale_xanthopus",
+    "common_name": "Yellow-footed Rock-wallaby",
+    "class": "Mammalia",
+    "family": "Macropodidae",
+    "units": "sample: abundance (counts)"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "entity_type": "population",
+  "entity_id": "110261",
+  "n_data_points": 39,
+  "year_min": 1982,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "temp_change_1y",
+      "category": "climate",
+      "importance_mean": 0.007691482796056054,
+      "contribution_pct": 77.21
+    },
+    {
+      "feature": "temp_roll3",
+      "category": "climate",
+      "importance_mean": 0.0015333525271939874,
+      "contribution_pct": 15.39
+    },
+    {
+      "feature": "temp_anom_country",
+      "category": "climate",
+      "importance_mean": 0.0007373180277377766,
+      "contribution_pct": 7.4
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "population_id": "110261",
+    "species_binomial": "Burramys_parvus",
+    "common_name": "Mountain Pygmy-possum",
+    "country": "australia",
+    "class": "Mammalia",
+    "family": "Burramyidae",
+    "units": "sample: occupancy (# presences/# surveys = trapping success: number of encounters (captures) of males per 100 trap nights of effort)"
+  }
+}

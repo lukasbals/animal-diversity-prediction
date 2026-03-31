@@ -1,0 +1,102 @@
+[
+  {
+    "entity_type": "species_country",
+    "entity_id": "Lichenostomus_melanops__australia",
+    "name": "Helmeted Honeyeater",
+    "country": "australia",
+    "n_data_points": 31,
+    "year_min": 1990,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_country_reports\\species_country_Lichenostomus_melanops__australia.json"
+  },
+  {
+    "entity_type": "species_country",
+    "entity_id": "Gymnobelideus_leadbeateri__australia",
+    "name": "Leadbeater's Possum",
+    "country": "australia",
+    "n_data_points": 20,
+    "year_min": 2001,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_country_reports\\species_country_Gymnobelideus_leadbeateri__australia.json"
+  },
+  {
+    "entity_type": "species_country",
+    "entity_id": "Leipoa_ocellata__australia",
+    "name": "Malleefowl",
+    "country": "australia",
+    "n_data_points": 31,
+    "year_min": 1990,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_country_reports\\species_country_Leipoa_ocellata__australia.json"
+  },
+  {
+    "entity_type": "species_country",
+    "entity_id": "Alces_americanus__canada",
+    "name": "Moose",
+    "country": "canada",
+    "n_data_points": 36,
+    "year_min": 1981,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_country_reports\\species_country_Alces_americanus__canada.json"
+  },
+  {
+    "entity_type": "species_country",
+    "entity_id": "Burramys_parvus__australia",
+    "name": "Mountain Pygmy-possum",
+    "country": "australia",
+    "n_data_points": 39,
+    "year_min": 1982,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_country_reports\\species_country_Burramys_parvus__australia.json"
+  },
+  {
+    "entity_type": "species_country",
+    "entity_id": "Pedionomus_torquatus__australia",
+    "name": "Plains-wanderer",
+    "country": "australia",
+    "n_data_points": 20,
+    "year_min": 2001,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_country_reports\\species_country_Pedionomus_torquatus__australia.json"
+  },
+  {
+    "entity_type": "species_country",
+    "entity_id": "Gulo_gulo__finland",
+    "name": "Wolverine",
+    "country": "finland",
+    "n_data_points": 32,
+    "year_min": 1989,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_country_reports\\species_country_Gulo_gulo__finland.json"
+  },
+  {
+    "entity_type": "species_country",
+    "entity_id": "Gulo_gulo__norway",
+    "name": "Wolverine",
+    "country": "norway",
+    "n_data_points": 23,
+    "year_min": 1998,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_country_reports\\species_country_Gulo_gulo__norway.json"
+  },
+  {
+    "entity_type": "species_country",
+    "entity_id": "Gulo_gulo__sweden",
+    "name": "Wolverine",
+    "country": "sweden",
+    "n_data_points": 23,
+    "year_min": 1998,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_country_reports\\species_country_Gulo_gulo__sweden.json"
+  },
+  {
+    "entity_type": "species_country",
+    "entity_id": "Petrogale_xanthopus__australia",
+    "name": "Yellow-footed Rock-wallaby",
+    "country": "australia",
+    "n_data_points": 40,
+    "year_min": 1980,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_country_reports\\species_country_Petrogale_xanthopus__australia.json"
+  }
+]

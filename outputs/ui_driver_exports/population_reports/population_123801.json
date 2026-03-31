@@ -1,0 +1,38 @@
+{
+  "entity_type": "population",
+  "entity_id": "123801",
+  "n_data_points": 31,
+  "year_min": 1990,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "temp_change_1y",
+      "category": "climate",
+      "importance_mean": 0.0010156007632897257,
+      "contribution_pct": 34.58
+    },
+    {
+      "feature": "precip_mm",
+      "category": "climate",
+      "importance_mean": 0.0009965511388157905,
+      "contribution_pct": 33.94
+    },
+    {
+      "feature": "precip_change_1y",
+      "category": "climate",
+      "importance_mean": 0.0009244629586184188,
+      "contribution_pct": 31.48
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "population_id": "123801",
+    "species_binomial": "Lichenostomus_melanops",
+    "common_name": "Helmeted Honeyeater",
+    "country": "australia",
+    "class": "Aves",
+    "family": "Meliphagidae",
+    "units": "sample: abundance (counts)"
+  }
+}

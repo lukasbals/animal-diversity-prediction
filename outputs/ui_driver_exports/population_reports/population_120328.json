@@ -1,0 +1,38 @@
+{
+  "entity_type": "population",
+  "entity_id": "120328",
+  "n_data_points": 27,
+  "year_min": 1994,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "temp_change_1y",
+      "category": "climate",
+      "importance_mean": 0.1099048843829524,
+      "contribution_pct": 59.66
+    },
+    {
+      "feature": "temp_anom_country",
+      "category": "climate",
+      "importance_mean": 0.03893137249457969,
+      "contribution_pct": 21.13
+    },
+    {
+      "feature": "temp_avg_c",
+      "category": "climate",
+      "importance_mean": 0.03538802606482691,
+      "contribution_pct": 19.21
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "population_id": "120328",
+    "species_binomial": "Leipoa_ocellata",
+    "common_name": "Malleefowl",
+    "country": "australia",
+    "class": "Aves",
+    "family": "Megapodiidae",
+    "units": "proxy: breeding pairs"
+  }
+}

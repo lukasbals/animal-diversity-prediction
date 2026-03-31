@@ -1,0 +1,74 @@
+[
+  {
+    "entity_type": "species",
+    "entity_id": "Lichenostomus_melanops",
+    "name": "Helmeted Honeyeater",
+    "n_data_points": 31,
+    "year_min": 1990,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_reports\\species_Lichenostomus_melanops.json"
+  },
+  {
+    "entity_type": "species",
+    "entity_id": "Gymnobelideus_leadbeateri",
+    "name": "Leadbeater's Possum",
+    "n_data_points": 20,
+    "year_min": 2001,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_reports\\species_Gymnobelideus_leadbeateri.json"
+  },
+  {
+    "entity_type": "species",
+    "entity_id": "Leipoa_ocellata",
+    "name": "Malleefowl",
+    "n_data_points": 31,
+    "year_min": 1990,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_reports\\species_Leipoa_ocellata.json"
+  },
+  {
+    "entity_type": "species",
+    "entity_id": "Alces_americanus",
+    "name": "Moose",
+    "n_data_points": 36,
+    "year_min": 1981,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_reports\\species_Alces_americanus.json"
+  },
+  {
+    "entity_type": "species",
+    "entity_id": "Burramys_parvus",
+    "name": "Mountain Pygmy-possum",
+    "n_data_points": 39,
+    "year_min": 1982,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_reports\\species_Burramys_parvus.json"
+  },
+  {
+    "entity_type": "species",
+    "entity_id": "Pedionomus_torquatus",
+    "name": "Plains-wanderer",
+    "n_data_points": 20,
+    "year_min": 2001,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_reports\\species_Pedionomus_torquatus.json"
+  },
+  {
+    "entity_type": "species",
+    "entity_id": "Gulo_gulo",
+    "name": "Wolverine",
+    "n_data_points": 32,
+    "year_min": 1989,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_reports\\species_Gulo_gulo.json"
+  },
+  {
+    "entity_type": "species",
+    "entity_id": "Petrogale_xanthopus",
+    "name": "Yellow-footed Rock-wallaby",
+    "n_data_points": 40,
+    "year_min": 1980,
+    "year_max": 2020,
+    "json_path": "C:\\Users\\Vaccari\\Desktop\\iCloudDrive\\Desktop\\ENRICO\\05_LEARNING\\University\\ToU\\Phases\\03_Elevation_Phase\\02_Challenge\\animal-diversity-prediction\\outputs\\ui_driver_exports\\species_reports\\species_Petrogale_xanthopus.json"
+  }
+]

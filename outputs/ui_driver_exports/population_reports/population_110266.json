@@ -1,0 +1,19 @@
+{
+  "entity_type": "population",
+  "entity_id": "110266",
+  "n_data_points": 20,
+  "year_min": 2001,
+  "year_max": 2020,
+  "top_environmental_drivers": [],
+  "driver_note": "No meaningful positive environmental contribution identified under the selected setup.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "population_id": "110266",
+    "species_binomial": "Gymnobelideus_leadbeateri",
+    "common_name": "Leadbeater's Possum",
+    "country": "australia",
+    "class": "Mammalia",
+    "family": "Petauridae",
+    "units": "sample: abundance (counts)"
+  }
+}

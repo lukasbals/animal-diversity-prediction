@@ -1,0 +1,38 @@
+{
+  "entity_type": "population",
+  "entity_id": "111105",
+  "n_data_points": 40,
+  "year_min": 1980,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "precip_change_1y",
+      "category": "climate",
+      "importance_mean": 0.02670228496471664,
+      "contribution_pct": 91.2
+    },
+    {
+      "feature": "agricultural_land_change_1y",
+      "category": "anthropogenic",
+      "importance_mean": 0.002363812063353096,
+      "contribution_pct": 8.07
+    },
+    {
+      "feature": "temp_avg_c",
+      "category": "climate",
+      "importance_mean": 0.0002123225333695772,
+      "contribution_pct": 0.73
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "population_id": "111105",
+    "species_binomial": "Petrogale_xanthopus",
+    "common_name": "Yellow-footed Rock-wallaby",
+    "country": "australia",
+    "class": "Mammalia",
+    "family": "Macropodidae",
+    "units": "sample: abundance (counts)"
+  }
+}

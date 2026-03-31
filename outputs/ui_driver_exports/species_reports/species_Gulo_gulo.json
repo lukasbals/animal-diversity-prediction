@@ -1,0 +1,36 @@
+{
+  "entity_type": "species",
+  "entity_id": "Gulo_gulo",
+  "n_data_points": 32,
+  "year_min": 1989,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "precip_change_1y",
+      "category": "climate",
+      "importance_mean": 0.0036811532907662244,
+      "contribution_pct": 33.48
+    },
+    {
+      "feature": "precip_anom_country",
+      "category": "climate",
+      "importance_mean": 0.003662778450129003,
+      "contribution_pct": 33.32
+    },
+    {
+      "feature": "urban_share_change_1y",
+      "category": "anthropogenic",
+      "importance_mean": 0.0036499001331070403,
+      "contribution_pct": 33.2
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "species_binomial": "Gulo_gulo",
+    "common_name": "Wolverine",
+    "class": "Mammalia",
+    "family": "Mustelidae",
+    "units": "estimated number of individuals"
+  }
+}

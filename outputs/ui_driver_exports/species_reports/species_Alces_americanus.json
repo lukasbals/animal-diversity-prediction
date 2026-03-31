@@ -1,0 +1,36 @@
+{
+  "entity_type": "species",
+  "entity_id": "Alces_americanus",
+  "n_data_points": 36,
+  "year_min": 1981,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "agricultural_land_change_1y",
+      "category": "anthropogenic",
+      "importance_mean": 0.015047898290461686,
+      "contribution_pct": 82.7
+    },
+    {
+      "feature": "agricultural_land_log1p",
+      "category": "anthropogenic",
+      "importance_mean": 0.0017966265018205224,
+      "contribution_pct": 9.87
+    },
+    {
+      "feature": "precip_change_1y",
+      "category": "climate",
+      "importance_mean": 0.0013521290046272032,
+      "contribution_pct": 7.43
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "species_binomial": "Alces_americanus",
+    "common_name": "Moose",
+    "class": "Mammalia",
+    "family": "Cervidae",
+    "units": "adult individuals (bulls and cows)"
+  }
+}

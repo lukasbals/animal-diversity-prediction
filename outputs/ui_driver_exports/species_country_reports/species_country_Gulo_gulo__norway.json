@@ -1,0 +1,37 @@
+{
+  "entity_type": "species_country",
+  "entity_id": "Gulo_gulo__norway",
+  "n_data_points": 23,
+  "year_min": 1998,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "precip_roll3",
+      "category": "climate",
+      "importance_mean": 0.004756982905893726,
+      "contribution_pct": 86.86
+    },
+    {
+      "feature": "agricultural_land_change_1y",
+      "category": "anthropogenic",
+      "importance_mean": 0.000591890519323638,
+      "contribution_pct": 10.81
+    },
+    {
+      "feature": "temp_avg_c",
+      "category": "climate",
+      "importance_mean": 0.0001275847720665038,
+      "contribution_pct": 2.33
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "species_binomial": "Gulo_gulo",
+    "common_name": "Wolverine",
+    "country": "norway",
+    "class": "Mammalia",
+    "family": "Mustelidae",
+    "units": "estimated number of individuals"
+  }
+}

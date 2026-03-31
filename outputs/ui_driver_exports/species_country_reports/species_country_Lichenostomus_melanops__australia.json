@@ -1,0 +1,37 @@
+{
+  "entity_type": "species_country",
+  "entity_id": "Lichenostomus_melanops__australia",
+  "n_data_points": 31,
+  "year_min": 1990,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "wildfire_area_ha_per_fire_log1p",
+      "category": "anthropogenic",
+      "importance_mean": 0.0011753467550385684,
+      "contribution_pct": 44.76
+    },
+    {
+      "feature": "wildfire_change_1y",
+      "category": "anthropogenic",
+      "importance_mean": 0.0008560649719669897,
+      "contribution_pct": 32.6
+    },
+    {
+      "feature": "urban_share_change_1y",
+      "category": "anthropogenic",
+      "importance_mean": 0.0005944260138345273,
+      "contribution_pct": 22.64
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "species_binomial": "Lichenostomus_melanops",
+    "common_name": "Helmeted Honeyeater",
+    "country": "australia",
+    "class": "Aves",
+    "family": "Meliphagidae",
+    "units": "sample: abundance (counts)"
+  }
+}

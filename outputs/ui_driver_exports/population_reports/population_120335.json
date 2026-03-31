@@ -1,0 +1,38 @@
+{
+  "entity_type": "population",
+  "entity_id": "120335",
+  "n_data_points": 29,
+  "year_min": 1992,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "wildfire_area_ha_per_fire_log1p",
+      "category": "anthropogenic",
+      "importance_mean": 0.002615644330506406,
+      "contribution_pct": 51.98
+    },
+    {
+      "feature": "wildfire_change_1y",
+      "category": "anthropogenic",
+      "importance_mean": 0.0014548589785456033,
+      "contribution_pct": 28.91
+    },
+    {
+      "feature": "agricultural_land_log1p",
+      "category": "anthropogenic",
+      "importance_mean": 0.0009614890430487355,
+      "contribution_pct": 19.11
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "population_id": "120335",
+    "species_binomial": "Leipoa_ocellata",
+    "common_name": "Malleefowl",
+    "country": "australia",
+    "class": "Aves",
+    "family": "Megapodiidae",
+    "units": "proxy: breeding pairs"
+  }
+}

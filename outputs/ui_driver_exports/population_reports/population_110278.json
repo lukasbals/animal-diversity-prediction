@@ -1,0 +1,38 @@
+{
+  "entity_type": "population",
+  "entity_id": "110278",
+  "n_data_points": 20,
+  "year_min": 2001,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "precip_mm",
+      "category": "climate",
+      "importance_mean": 0.0009536483877187529,
+      "contribution_pct": 49.76
+    },
+    {
+      "feature": "agricultural_land_change_1y",
+      "category": "anthropogenic",
+      "importance_mean": 0.0005233558387645693,
+      "contribution_pct": 27.31
+    },
+    {
+      "feature": "precip_anom_country",
+      "category": "climate",
+      "importance_mean": 0.00043939480935082373,
+      "contribution_pct": 22.93
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "population_id": "110278",
+    "species_binomial": "Gymnobelideus_leadbeateri",
+    "common_name": "Leadbeater's Possum",
+    "country": "australia",
+    "class": "Mammalia",
+    "family": "Petauridae",
+    "units": "sample: abundance (counts)"
+  }
+}

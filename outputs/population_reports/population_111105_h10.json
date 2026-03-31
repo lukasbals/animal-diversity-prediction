@@ -11,7 +11,7 @@
     "feature_set": "forecast_plus_env_transformed",
     "model_name": "RandomForest",
     "ci_level": 0.9,
-    "residual_std_log": 0.46352835629302813
+    "residual_std_log": 0.463528356293028
   },
   "historical_records": [
     {
@@ -178,80 +178,80 @@
   "forecast_records": [
     {
       "year": 2021,
-      "forecast_population": 22.674359668060834,
-      "lower_ci": 10.044012720274685,
-      "upper_ci": 49.749244852261036
+      "forecast_population": 22.674359668060813,
+      "lower_ci": 10.044012720274674,
+      "upper_ci": 49.74924485226099
     },
     {
       "year": 2022,
-      "forecast_population": 28.621989973815587,
-      "lower_ci": 9.07617055547996,
-      "upper_ci": 86.08291361062963
+      "forecast_population": 28.62198997381555,
+      "lower_ci": 9.076170555479951,
+      "upper_ci": 86.08291361062948
     },
     {
       "year": 2023,
-      "forecast_population": 27.285319826265855,
+      "forecast_population": 27.285319826265845,
       "lower_ci": 6.550750890231029,
       "upper_ci": 104.95758346487693
     },
     {
       "year": 2024,
-      "forecast_population": 29.676948249237952,
-      "lower_ci": 5.675894541289861,
-      "upper_ci": 139.96615038867833
+      "forecast_population": 29.67694824923798,
+      "lower_ci": 5.67589454128987,
+      "upper_ci": 139.96615038867844
     },
     {
       "year": 2025,
-      "forecast_population": 30.18573741583781,
-      "lower_ci": 4.668642960833844,
+      "forecast_population": 30.185737415837824,
+      "lower_ci": 4.668642960833848,
       "upper_ci": 170.56667387401072
     },
     {
       "year": 2026,
-      "forecast_population": 35.78476461743678,
-      "lower_ci": 4.682195386609348,
+      "forecast_population": 35.78476461743679,
+      "lower_ci": 4.682195386609355,
       "upper_ci": 237.13311860922389
     },
     {
       "year": 2027,
-      "forecast_population": 38.20069726706855,
-      "lower_ci": 4.2137438649463785,
-      "upper_ci": 293.7391943351939
+      "forecast_population": 38.20069726706849,
+      "lower_ci": 4.213743864946374,
+      "upper_ci": 293.7391943351933
     },
     {
       "year": 2028,
-      "forecast_population": 38.00986652526446,
-      "lower_ci": 3.5137450293933874,
-      "upper_ci": 336.1412599535916
+      "forecast_population": 38.00986652526449,
+      "lower_ci": 3.5137450293933927,
+      "upper_ci": 336.1412599535919
     },
     {
       "year": 2029,
-      "forecast_population": 40.813350749496365,
-      "lower_ci": 3.2448362581677204,
+      "forecast_population": 40.8133507494964,
+      "lower_ci": 3.2448362581677275,
       "upper_ci": 410.87838459876986
     },
     {
       "year": 2030,
       "forecast_population": 41.143932058511254,
-      "lower_ci": 2.780441820110109,
-      "upper_ci": 468.81572362901267
+      "lower_ci": 2.7804418201101124,
+      "upper_ci": 468.8157236290122
     }
   ],
   "top_environmental_drivers": [
     {
       "feature": "precip_change_1y",
-      "contribution_pct": 91.20125117642749,
-      "importance_mean": 0.026702284964716723
+      "contribution_pct": 91.20125117642787,
+      "importance_mean": 0.02670228496471665
     },
     {
       "feature": "agricultural_land_change_1y",
-      "contribution_pct": 8.073564416251333,
-      "importance_mean": 0.002363812063353149
+      "contribution_pct": 8.07356441625114,
+      "importance_mean": 0.002363812063353077
     },
     {
       "feature": "temp_avg_c",
-      "contribution_pct": 0.7251844073211584,
-      "importance_mean": 0.00021232253336962714
+      "contribution_pct": 0.7251844073209832,
+      "importance_mean": 0.0002123225333695744
     }
   ],
   "driver_note": "Permutation importance computed on the last observed years of the population.",

@@ -1,0 +1,36 @@
+{
+  "entity_type": "species",
+  "entity_id": "Pedionomus_torquatus",
+  "n_data_points": 20,
+  "year_min": 2001,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "temp_change_1y",
+      "category": "climate",
+      "importance_mean": 0.002563786585973709,
+      "contribution_pct": 65.18
+    },
+    {
+      "feature": "precip_anom_country",
+      "category": "climate",
+      "importance_mean": 0.0008432904675346109,
+      "contribution_pct": 21.44
+    },
+    {
+      "feature": "precip_mm",
+      "category": "climate",
+      "importance_mean": 0.0005264886804096163,
+      "contribution_pct": 13.38
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "species_binomial": "Pedionomus_torquatus",
+    "common_name": "Plains-wanderer",
+    "class": "Aves",
+    "family": "Pedionomidae",
+    "units": "sample: density (counts/fixed areas)"
+  }
+}

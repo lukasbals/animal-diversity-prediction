@@ -1,0 +1,36 @@
+{
+  "entity_type": "species",
+  "entity_id": "Leipoa_ocellata",
+  "n_data_points": 31,
+  "year_min": 1990,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "agricultural_land_change_1y",
+      "category": "anthropogenic",
+      "importance_mean": 0.03662922505822124,
+      "contribution_pct": 89.03
+    },
+    {
+      "feature": "wildfire_area_ha_per_fire_log1p",
+      "category": "anthropogenic",
+      "importance_mean": 0.003201088950930006,
+      "contribution_pct": 7.78
+    },
+    {
+      "feature": "forest_share_pct",
+      "category": "anthropogenic",
+      "importance_mean": 0.001310465104550179,
+      "contribution_pct": 3.19
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "species_binomial": "Leipoa_ocellata",
+    "common_name": "Malleefowl",
+    "class": "Aves",
+    "family": "Megapodiidae",
+    "units": "proxy: breeding pairs"
+  }
+}

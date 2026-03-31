@@ -1,0 +1,38 @@
+{
+  "entity_type": "population",
+  "entity_id": "27563",
+  "n_data_points": 32,
+  "year_min": 1989,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "temp_anom_country",
+      "category": "climate",
+      "importance_mean": 0.026664648641172673,
+      "contribution_pct": 48.25
+    },
+    {
+      "feature": "temp_avg_c",
+      "category": "climate",
+      "importance_mean": 0.015126903669614755,
+      "contribution_pct": 27.38
+    },
+    {
+      "feature": "temp_change_1y",
+      "category": "climate",
+      "importance_mean": 0.0134641040838163,
+      "contribution_pct": 24.37
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "population_id": "27563",
+    "species_binomial": "Gulo_gulo",
+    "common_name": "Wolverine",
+    "country": "finland",
+    "class": "Mammalia",
+    "family": "Mustelidae",
+    "units": "estimated number of individuals"
+  }
+}

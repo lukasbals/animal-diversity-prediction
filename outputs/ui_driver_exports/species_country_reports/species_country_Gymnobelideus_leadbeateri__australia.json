@@ -1,0 +1,37 @@
+{
+  "entity_type": "species_country",
+  "entity_id": "Gymnobelideus_leadbeateri__australia",
+  "n_data_points": 20,
+  "year_min": 2001,
+  "year_max": 2020,
+  "top_environmental_drivers": [
+    {
+      "feature": "precip_change_1y",
+      "category": "climate",
+      "importance_mean": 0.013018516587943202,
+      "contribution_pct": 85.19
+    },
+    {
+      "feature": "precip_anom_country",
+      "category": "climate",
+      "importance_mean": 0.0013909659630306852,
+      "contribution_pct": 9.1
+    },
+    {
+      "feature": "temp_anom_country",
+      "category": "climate",
+      "importance_mean": 0.0008732652648494821,
+      "contribution_pct": 5.71
+    }
+  ],
+  "driver_note": "Permutation importance computed on the last observed years of the population.",
+  "interpretation_note": "Drivers are model-based associations, not direct causal effects.",
+  "metadata": {
+    "species_binomial": "Gymnobelideus_leadbeateri",
+    "common_name": "Leadbeater's Possum",
+    "country": "australia",
+    "class": "Mammalia",
+    "family": "Petauridae",
+    "units": "sample: abundance (counts)"
+  }
+}
