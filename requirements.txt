@@ -20,6 +20,11 @@ pydantic==2.12.5
 pydantic_core==2.41.5
 scikit-learn==1.5.2
 scipy==1.13.1
+joblib==1.4.2
+optuna
+
+# Development dependencies
+ipykernel==7.1.0
 seaborn==0.13.2
 starlette==1.0.0
 uvicorn==0.42.0
