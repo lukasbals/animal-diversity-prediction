@@ -19,7 +19,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import {
   ChevronDown,
   ChevronRight,
@@ -211,6 +211,8 @@ function EndangeredSpeciesMap({
   onSelectPopulation: (populationId: number) => void;
 }) {
   const selected = populations.find((population) => population.population_id === selectedPopulationId) ?? null;
+  const [zoom, setZoom] = useState(1);
+  const [center, setCenter] = useState<[number, number]>([0, 20]);
 
   return (
     <DashboardCard className="overflow-hidden p-0">
@@ -227,41 +229,75 @@ function EndangeredSpeciesMap({
       </div>
       <div className="world-glow relative h-[360px] overflow-hidden bg-slate-950/70 px-2 py-3 sm:h-[420px] sm:px-3 sm:py-4 lg:h-[480px]">
         <ComposableMap projection="geoMercator" projectionConfig={{ scale: 120 }} style={{ width: "100%", height: "100%" }}>
-          <Geographies geography={WORLD_TOPOJSON}>
-            {({ geographies }: { geographies: Array<{ rsmKey: string; [key: string]: unknown }> }) =>
-              geographies.map((geo) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="#0f172a"
-                  stroke="rgba(148,163,184,0.18)"
-                  strokeWidth={0.5}
-                  style={{ default: { outline: "none" }, hover: { outline: "none", fill: "#132036" }, pressed: { outline: "none" } }}
-                />
-              ))
-            }
-          </Geographies>
+          <ZoomableGroup
+            zoom={zoom}
+            center={center}
+            onMoveEnd={({ zoom: z, coordinates }: { zoom: number; coordinates: [number, number] }) => {
+              setZoom(z);
+              setCenter(coordinates);
+            }}
+          >
+            <Geographies geography={WORLD_TOPOJSON}>
+              {({ geographies }: { geographies: Array<{ rsmKey: string; [key: string]: unknown }> }) =>
+                geographies.map((geo) => (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill="#0f172a"
+                    stroke="rgba(148,163,184,0.18)"
+                    strokeWidth={0.5}
+                    style={{ default: { outline: "none" }, hover: { outline: "none", fill: "#132036" }, pressed: { outline: "none" } }}
+                  />
+                ))
+              }
+            </Geographies>
 
-          {populations.map((population) => {
-            const isSelected = population.population_id === selectedPopulationId;
-            return (
-              <Marker key={population.population_id} coordinates={[population.longitude, population.latitude]}>
-                <Tooltip.Root>
-                  <Tooltip.Trigger asChild>
-                    <g onClick={() => onSelectPopulation(population.population_id)} className="cursor-pointer">
-                      <circle r={isSelected ? 7 : 5} fill={isSelected ? "#ef4444" : "#f97316"} stroke="#fff" strokeWidth={1.5} />
-                    </g>
-                  </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Content className="rounded-full border border-white/10 bg-slate-950 px-3 py-2 text-xs text-slate-200">
-                      {population.common_name}
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
-              </Marker>
-            );
-          })}
+            {populations.map((population) => {
+              const isSelected = population.population_id === selectedPopulationId;
+              return (
+                <Marker key={population.population_id} coordinates={[population.longitude, population.latitude]}>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <g onClick={() => onSelectPopulation(population.population_id)} className="cursor-pointer">
+                        <circle r={isSelected ? 7 / zoom : 5 / zoom} fill={isSelected ? "#ef4444" : "#f97316"} stroke="#fff" strokeWidth={1.5 / zoom} />
+                      </g>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content className="rounded-full border border-white/10 bg-slate-950 px-3 py-2 text-xs text-slate-200">
+                        {population.common_name}
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Marker>
+              );
+            })}
+          </ZoomableGroup>
         </ComposableMap>
+
+        <div className="absolute right-3 top-3 flex flex-col gap-1">
+          <button
+            onClick={() => setZoom((z) => Math.min(z * 1.5, 20))}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-slate-950/80 text-slate-300 transition hover:bg-slate-800 hover:text-white"
+            aria-label="Zoom in"
+          >
+            +
+          </button>
+          <button
+            onClick={() => setZoom((z) => Math.max(z / 1.5, 1))}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-slate-950/80 text-slate-300 transition hover:bg-slate-800 hover:text-white"
+            aria-label="Zoom out"
+          >
+            −
+          </button>
+          <button
+            onClick={() => { setZoom(1); setCenter([0, 20]); }}
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-slate-950/80 text-xs text-slate-300 transition hover:bg-slate-800 hover:text-white"
+            aria-label="Reset zoom"
+            title="Reset"
+          >
+            ↺
+          </button>
+        </div>
 
         {selected ? (
           <div className="absolute inset-x-3 bottom-3 rounded-3xl border border-white/10 bg-slate-950/90 p-3 shadow-glow sm:inset-x-auto sm:bottom-5 sm:left-5 sm:w-72 sm:p-4">
