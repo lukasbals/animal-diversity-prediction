@@ -176,14 +176,14 @@ def _status_from_risk(score: int) -> str:
 
 def _species_image(common_name: str) -> str:
     image_map = {
-        "Wolverine": "https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=1200&q=80",
-        "Moose": "https://images.unsplash.com/photo-1501706362039-c6e80948e4ca?auto=format&fit=crop&w=1200&q=80",
-        "Mountain Pygmy-possum": "https://images.unsplash.com/photo-1500479694472-551d1fb6258d?auto=format&fit=crop&w=1200&q=80",
-        "Leadbeater's Possum": "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?auto=format&fit=crop&w=1200&q=80",
-        "Yellow-footed Rock-wallaby": "https://images.unsplash.com/photo-1466721591366-2d5fba72006d?auto=format&fit=crop&w=1200&q=80",
-        "Malleefowl": "https://images.unsplash.com/photo-1549608276-5786777e6587?auto=format&fit=crop&w=1200&q=80",
-        "Helmeted Honeyeater": "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=1200&q=80",
-        "Plains-wanderer": "https://images.unsplash.com/photo-1501706362039-c6e80948e4ca?auto=format&fit=crop&w=1200&q=80",
+        "Wolverine": "https://images.unsplash.com/photo-1585473689681-8f7e1bca5ec9?q=80&w=2942&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "Moose": "https://images.unsplash.com/photo-1582002834723-2256d33da100?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "Mountain Pygmy-possum": "https://images.unsplash.com/photo-1720188490664-bea933e5aa7c?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "Leadbeater's Possum": "https://www.helmetedhoneyeater.org.au/wp-content/uploads/2018/05/Leadbeaters-Possum_image-Jason-Edwards.jpg",
+        "Yellow-footed Rock-wallaby": "https://images.unsplash.com/photo-1724184460140-f349de407697?q=80&w=2831&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "Malleefowl": "https://fnpw.org.au/wp-content/uploads/2021/01/2113-malleefowl-Jill-Lochman_Cropped.jpg",
+        "Helmeted Honeyeater": "https://www.helmetedhoneyeater.org.au/wp-content/uploads/2018/05/1L9A9250-1.jpg",
+        "Plains-wanderer": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Plains-wanderer_female_8173.jpg/3840px-Plains-wanderer_female_8173.jpg",
     }
     return image_map.get(
         common_name,
