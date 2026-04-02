@@ -388,7 +388,7 @@ export function DashboardShell() {
   }, [species, speciesList]);
 
   const similarSpecies = useMemo(() => {
-    if (!species) return speciesList.slice(0, 4);
+    if (!species) return speciesList.slice(0, 2);
 
     return speciesList
       .filter((item) => item.species_id !== selectedCard?.species_id)
@@ -398,7 +398,7 @@ export function DashboardShell() {
           item.class_name === selectedCard?.class_name ||
           item.habitat === selectedCard?.habitat
       )
-      .slice(0, 6);
+      .slice(0, 2);
   }, [species, speciesList, selectedCard]);
 
   const displaySpecies = species ?? {
